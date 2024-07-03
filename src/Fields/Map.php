@@ -96,8 +96,6 @@ class Map extends Field
         'statePath'            => '',
         'defaultCenter'     => [ 10.7578001, 106.6309967 ],
         'defaultZoom'          => 8,
-        'draggable'           => true,
-        'clickable'           => false,
         'controls'       => [],
 //        'drawingControl' => false,
 //        'drawingModes'   => [
@@ -169,43 +167,6 @@ class Map extends Field
         if(is_numeric($zoom) && $zoom >= 0) return $zoom;
 
         return config('filament-map.map_options.zoom');
-    }
-
-    /**
-     * Sets whether the marker can be moved by dragging, default is true
-     *
-     *
-     * @return $this
-     */
-    public function draggable(Closure|bool $draggable = true): static
-    {
-        $this->draggable = $draggable;
-
-        return $this;
-    }
-
-    public function getDraggable(): bool
-    {
-        return $this->evaluate($this->draggable);
-    }
-
-    /**
-     * Sets whether clicking on the map sets the marker location, can be used by itself or in conjunction with
-     * draggable, default is false
-     *
-     *
-     * @return $this
-     */
-    public function clickable(Closure|bool $clickable = true): static
-    {
-        $this->clickable = $clickable;
-
-        return $this;
-    }
-
-    public function getClickable(): bool
-    {
-        return $this->evaluate($this->clickable);
     }
 
     public function zoomToState(Closure|bool $bool = true): static
@@ -436,8 +397,6 @@ class Map extends Field
 
             'defaultCenter'        => $this->getDefaultCenter(),
             'defaultZoom'            => $this->getDefaultZoom(),
-            'draggable'              => $this->getDraggable(),
-            'clickable'              => $this->getClickable(),
             'zoomToState'              => $this->getZoomToState(),
             'controls'               => $this->getMapControls(false),
 //            'drawingControl'         => $this->getDrawingControl(),
