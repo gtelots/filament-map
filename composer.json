@@ -1,0 +1,69 @@
+{
+    "name": "laragis/filament-map",
+    "description": "This is my package filament-map",
+    "keywords": [
+        "laragis",
+        "laravel",
+        "filament-map"
+    ],
+    "homepage": "https://github.com/laragis/filament-map",
+    "support": {
+        "issues": "https://github.com/laragis/filament-map/issues",
+        "source": "https://github.com/laragis/filament-map"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Truong Thanh Tung",
+            "email": "ttungbmt@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "filament/forms": "^3.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^7.9",
+        "orchestra/testbench": "^8.0",
+        "pestphp/pest": "^2.1",
+        "pestphp/pest-plugin-arch": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaraGIS\\FilamentMap\\": "src/",
+            "LaraGIS\\FilamentMap\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaraGIS\\FilamentMap\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaraGIS\\FilamentMap\\FilamentMapServiceProvider"
+            ],
+            "aliases": {
+                "FilamentMap": "LaraGIS\\FilamentMap\\Facades\\FilamentMap"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

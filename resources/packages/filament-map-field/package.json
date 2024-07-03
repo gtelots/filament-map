@@ -1,0 +1,48 @@
+{
+  "name": "filament-map-field",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "^2.17.0",
+    "@react-leaflet/core": "^2.1.0",
+    "@turf/bbox": "^7.0.0",
+    "@turf/center": "^7.0.0",
+    "@turf/flip": "^7.0.0",
+    "@turf/invariant": "^7.0.0",
+    "@turf/point-on-feature": "^7.0.0",
+    "alpinejs": "^3.14.1",
+    "geojson": "^0.5.0",
+    "geojson-validation": "^1.0.2",
+    "leaflet": "^1.9.4",
+    "leaflet.fullscreen": "^3.0.2",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-geoman-v2": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/alpinejs": "^3.13.10",
+    "@types/geojson-validation": "^1.0.3",
+    "@types/leaflet": "^1.9.12",
+    "@types/prop-types": "^15.7.12",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "sass": "^1.77.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vite-plugin-externals": "^0.6.2"
+  }
+}
