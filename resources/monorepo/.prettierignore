@@ -1,0 +1,7 @@
+dist/
+temp/
+LICENSE.md
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.gitignore
+.editorconfig

@@ -18,9 +18,7 @@ class Map extends Field
 
     protected Closure|int|null $defaultZoom = 8;
 
-    protected Closure|bool $draggable = true;
-
-    protected Closure|bool $clickable = false;
+    protected Closure|string|null $geomType = null;
 
     protected Closure|bool $zoomToState = true;
 
@@ -62,28 +60,32 @@ class Map extends Field
      */
     protected Closure|array $rectangleOptions = [];
 
-    protected Closure|array $mapControls = [];
-
     public array $controls = [
         'zoomControl' => true,
+        'fullscreenControl' => true,
     ];
 
     protected Closure|array $baseLayers = [
         [
+            'title' => 'GTEL OTS Basic',
+            'url' => 'https://maps.ots.vn/api/v1/tiles/basic/{z}/{x}/{y}.png',
+            'selected' => true,
+            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+        ],
+        [
+            'title' => 'GTEL OTS Dark',
+            'url' => 'https://maps.ots.vn/api/v1/tiles/dark/{z}/{x}/{y}.png',
+            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+        ],
+        [
             'title' => 'Google Streets',
             'url' => 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-            'selected' => true,
             'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
         ],
         [
             'title' => 'Google Satellite',
             'url' => 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
             'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-        ],
-        [
-            'title' => 'OpenStreetMap',
-            'url' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         ],
     ];
 
@@ -167,6 +169,19 @@ class Map extends Field
         if(is_numeric($zoom) && $zoom >= 0) return $zoom;
 
         return config('filament-map.map_options.zoom');
+    }
+
+    public function geomType(Closure|string|null $geomType): static
+    {
+        $this->geomType = $geomType;
+
+        return $this;
+    }
+
+    public function getGeomType(): string|null
+    {
+
+        return $this->evaluate($this->geomType);
     }
 
     public function zoomToState(Closure|bool $bool = true): static
@@ -255,19 +270,14 @@ class Map extends Field
 
     public function controls(Closure|array $controls): static
     {
-        $this->mapControls = $controls;
+        $this->controls = $controls;
 
         return $this;
     }
 
-    /**
-     * @throws JsonException
-     */
-    public function getMapControls($encode = true): string|array
+    public function getControls(): array
     {
-        $controls = $this->evaluate($this->mapControls);
-
-        return $encode ? json_encode(array_merge($this->controls, $controls), JSON_THROW_ON_ERROR) : array_merge($this->controls, $controls);
+        return $this->evaluate($this->controls);
     }
 
     public function mapOptions(Closure|array $mapOptions): static
@@ -397,8 +407,9 @@ class Map extends Field
 
             'defaultCenter'        => $this->getDefaultCenter(),
             'defaultZoom'            => $this->getDefaultZoom(),
+            'geomType'            => $this->getGeomType(),
             'zoomToState'              => $this->getZoomToState(),
-            'controls'               => $this->getMapControls(false),
+            'controls'               => $this->getControls(),
 //            'drawingControl'         => $this->getDrawingControl(),
 //            'drawingControlPosition' => $this->getDrawingControlPosition(),
 //            'drawingModes'           => $this->getDrawingModes(),

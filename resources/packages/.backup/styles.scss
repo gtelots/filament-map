@@ -1,0 +1,49 @@
+@import '../node_modules/leaflet/dist/leaflet.css';
+
+.leaflet-container {
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.leaflet-touch .leaflet-bar {
+  border-radius: 8px;
+
+  > a:first-child {
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+  }
+
+  > a:last-child {
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .leaflet-control-zoom-fullscreen {
+    border-radius: 8px!important;
+  }
+
+}
+
+.leaflet-pm-toolbar {
+  .button-container:first-child a.leaflet-buttons-control-button {
+    border-top-right-radius: 8px!important;
+    border-top-left-radius: 8px!important;
+  }
+
+  .button-container:last-child a.leaflet-buttons-control-button {
+    border-bottom-right-radius: 8px!important;
+    border-bottom-left-radius: 8px!important;
+  }
+}
+
+.leaflet-control-layers {
+  border-radius: 8px;
+
+  .leaflet-control-layers-base {
+    label > span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}

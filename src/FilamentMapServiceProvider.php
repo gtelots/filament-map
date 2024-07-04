@@ -102,10 +102,14 @@ class FilamentMapServiceProvider extends PackageServiceProvider
     protected function getAssets(): array
     {
         return [
-//             AlpineComponent::make('filament-map-field', __DIR__ . '/../resources/dist/filament-map.js'),
-             AlpineComponent::make('filament-map-field', __DIR__ . '/../resources/packages/filament-map-field/dist/assets/index.js'),
-            Css::make('filament-map-field', __DIR__ . '/../resources/packages/filament-map-field/dist/assets/index.css'),
-//            Js::make('filament-map-scripts', __DIR__ . '/../resources/dist/filament-map.js'),
+            AlpineComponent::make('filament-map-column', __DIR__ . '/../resources/monorepo/apps/filament-map-column/dist/assets/index.js'),
+            Css::make('filament-map-column', __DIR__ . '/../resources/monorepo/apps/filament-map-column/dist/assets/index.css')->loadedOnRequest(),
+
+            AlpineComponent::make('filament-map-field', __DIR__ . '/../resources/monorepo/apps/filament-map-field/dist/assets/index.js'),
+            Css::make('filament-map-field', __DIR__ . '/../resources/monorepo/apps/filament-map-field/dist/assets/index.css')->loadedOnRequest(),
+
+            AlpineComponent::make('filament-map-entry', __DIR__ . '/../resources/monorepo/apps/filament-map-entry/dist/assets/index.js'),
+            Css::make('filament-map-entry', __DIR__ . '/../resources/monorepo/apps/filament-map-entry/dist/assets/index.css')->loadedOnRequest(),
         ];
     }
 
