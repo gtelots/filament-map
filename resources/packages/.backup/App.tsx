@@ -14,9 +14,6 @@ import { feature as createFeature } from "@turf/helpers";
 import bboxToBounds from './utils/bboxToBounds.ts'
 import { bbox } from '@turf/bbox'
 import { Map } from 'leaflet'
-import reactLogo from './assets/react.svg'
-
-console.log(reactLogo)
 
 export type AppProps = {
   $wire: any
@@ -59,8 +56,8 @@ const polyDrawOptions = {
 
 function App(props: AppProps) {
   const mapRef = useRef(null)
-  const { $wire, $watch, state, config } = props
 
+  const { $wire, $watch, state, config } = props
   const {
     statePath,
     latitudeField,

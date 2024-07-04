@@ -1,4 +1,42 @@
+$borderRadius: 8px;
+
 .leaflet-container {
   z-index: 10;
-  border-radius: 8px;
+  border-radius: $borderRadius;
 }
+
+.leaflet-touch .leaflet-bar {
+  border-radius: $borderRadius;
+
+  > a:first-child {
+    border-top-left-radius: $borderRadius;
+    border-top-right-radius: $borderRadius;
+  }
+
+  > a:last-child {
+    border-bottom-left-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
+  }
+}
+
+.leaflet-control-layers {
+  border-radius: $borderRadius;
+}
+
+.leaflet-pm-toolbar {
+  .button-container:first-child a.leaflet-buttons-control-button {
+    border-top-left-radius: $borderRadius!important;
+    border-top-right-radius: $borderRadius!important;
+  }
+
+  .button-container:last-child a.leaflet-buttons-control-button {
+    border-bottom-left-radius: $borderRadius!important;
+    border-bottom-right-radius: $borderRadius!important;
+  }
+}
+
+.leaflet-control-attribution {
+  a[href="https://leafletjs.com"], span[aria-hidden="true"] {
+    display: none;
+  }
+} 

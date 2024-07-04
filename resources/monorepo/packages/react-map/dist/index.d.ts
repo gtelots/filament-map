@@ -1,2 +1,3 @@
+declare function setDefaultIcon(options?: {}): void;
 
-export {  }
+export { setDefaultIcon };

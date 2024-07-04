@@ -3,6 +3,7 @@
 namespace LaraGIS\FilamentMap\Fields;
 
 use Closure;
+use Exception;
 use Filament\Forms\Components\Field;
 use LaraGIS\FilamentMap\Helpers\FieldHelper;
 
@@ -18,17 +19,30 @@ class Map extends Field
 
     protected Closure|int|null $defaultZoom = 8;
 
-    protected Closure|string|null $geomType = null;
-
-    protected Closure|bool $zoomToState = true;
-
     protected Closure|string|null $longitudeField = null;
 
     protected Closure|string|null $latitudeField = null;
 
-    protected Closure|string|null $geoJsonField = null;
+    protected Closure|string|null $drawField = null;
 
-    protected Closure|string|null $geoJsonProperty = null;
+    protected Closure|string|null $geomType = null;
+
+    protected Closure|bool $geolocateOnLoad = false;
+
+    protected Closure|bool $geolocateOnLoadAlways = false;
+
+    protected Closure|bool $zoomToFeature = true;
+
+    protected Closure|array $baseLayers = [];
+
+    protected Closure|array $layers = [];
+
+    public array $controls = [];
+
+    /**
+     * Main field config variables
+     */
+    private array $mapConfig = [];
 
     /**
      * MapOptions: https://leafletjs.com/reference.html#map-option
@@ -60,66 +74,6 @@ class Map extends Field
      */
     protected Closure|array $rectangleOptions = [];
 
-    public array $controls = [
-        'zoomControl' => true,
-        'fullscreenControl' => true,
-    ];
-
-    protected Closure|array $baseLayers = [
-        [
-            'title' => 'GTEL OTS Basic',
-            'url' => 'https://maps.ots.vn/api/v1/tiles/basic/{z}/{x}/{y}.png',
-            'selected' => true,
-            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-        ],
-        [
-            'title' => 'GTEL OTS Dark',
-            'url' => 'https://maps.ots.vn/api/v1/tiles/dark/{z}/{x}/{y}.png',
-            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-        ],
-        [
-            'title' => 'Google Streets',
-            'url' => 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-        ],
-        [
-            'title' => 'Google Satellite',
-            'url' => 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-            'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-        ],
-    ];
-
-    protected Closure|array $layers = [];
-
-    /**
-     * Main field config variables
-     */
-    private array $mapConfig = [
-        'statePath'            => '',
-        'defaultCenter'     => [ 10.7578001, 106.6309967 ],
-        'defaultZoom'          => 8,
-        'controls'       => [],
-//        'drawingControl' => false,
-//        'drawingModes'   => [
-//            'marker'    => true,
-//            'circle'    => true,
-//            'rectangle' => true,
-//            'polygon'   => true,
-//            'polyline'  => true,
-//        ],
-//        'drawingField'         => null,
-        'baseLayers'               => [],
-        'layers'               => [],
-//        'autocomplete'        => false,
-//        'autocompleteReverse' => false,
-//        'geolocate'           => false,
-//        'geolocateOnLoad'     => false,
-//        'geolocateLabel'      => '',
-//        'reverseGeocodeFields' => [],
-//        'debug'                => false,
-//        'gmaps'                => '',
-    ];
-
     public function height(Closure|string $height): static
     {
         $this->height = $height;
@@ -132,13 +86,13 @@ class Map extends Field
         return $this->evaluate($this->height);
     }
 
-    /**
-     * Set the default location for new maps, accepts an array of either [$lat, $lng] or ['lat' => $lat, 'lng' => $lng],
-     * or a closure which returns this
-     *
-     *
-     * @return $this
-     */
+    public function latitudeField(Closure|string|null $latitudeField = null): static
+    {
+        $this->latitudeField = $latitudeField;
+
+        return $this;
+    }
+
     public function defaultCenter(Closure|array $location): static
     {
         $this->defaultCenter = $location;
@@ -150,9 +104,9 @@ class Map extends Field
     {
         $position = $this->evaluate($this->defaultCenter);
 
-        if(is_array($position) && count($position) >= 2) return $position;
+        if(is_array($position)) return $position;
 
-        return config('filament-map.map_options.center');
+        return config('filament-map.config.mapOptions.center', [0, 0]);
     }
 
     public function defaultZoom(Closure|int|null $defaultZoom): static
@@ -166,42 +120,9 @@ class Map extends Field
     {
         $zoom = $this->evaluate($this->defaultZoom);
 
-        if(is_numeric($zoom) && $zoom >= 0) return $zoom;
+        if($zoom >= 0) return $zoom;
 
-        return config('filament-map.map_options.zoom');
-    }
-
-    public function geomType(Closure|string|null $geomType): static
-    {
-        $this->geomType = $geomType;
-
-        return $this;
-    }
-
-    public function getGeomType(): string|null
-    {
-
-        return $this->evaluate($this->geomType);
-    }
-
-    public function zoomToState(Closure|bool $bool = true): static
-    {
-        $this->zoomToState = $bool;
-
-        return $this;
-    }
-
-    public function getZoomToState(): bool
-    {
-        return $this->evaluate($this->zoomToState);
-    }
-
-
-    public function latitudeField(Closure|string|null $latitudeField = null): static
-    {
-        $this->latitudeField = $latitudeField;
-
-        return $this;
+        return config('filament-map.config.mapOptions.zoom') ?? 0;
     }
 
     public function getLatitudeField(): ?string
@@ -234,50 +155,73 @@ class Map extends Field
     }
 
     /**
-     * This method allows you to record which polygon(s) from the GeoJSON layer the map marker is contained by.  The
-     * $field arg is a field name on your form (which can be a Hidden field type).  Whenever the marker is moved, this field is
-     * updated to show which polygons now contain the marker.  If no $property is given as the second argument, the data saved
-     * in the field will be a GeoJSON FeatureCollection of the containing features.  If a $property is given, the data saved
-     * will be a simple JSON array of that property's value from each of the containing polygons.  In both cases this will save
-     * an empty collection/array if the marker is not within any polygon.
+     * Form field to update with GeoJSON (ish) representing draw coordinates
      *
      * @return $this
      */
-    public function geoJsonField(Closure|string|null $field = null, Closure|string|null $property = null): static
+    public function drawField(Closure|string|null $drawField = null): static
     {
-        $this->geoJsonField = $field;
-
-        $this->geoJsonProperty = $property;
+        $this->drawField = $drawField;
 
         return $this;
     }
 
-    public function getGeoJsonField(): ?string
+    public function getDrawField(): ?string
     {
-        $jsonField = $this->evaluate($this->geoJsonField);
+        $drawField = $this->evaluate($this->drawField);
 
-        if ($jsonField) {
-            return FieldHelper::getFieldId($jsonField, $this);
+        if ($drawField) {
+            return FieldHelper::getFieldId($drawField, $this);
         }
 
         return null;
     }
 
-    public function getGeoJsonProperty(): ?string
+    public function geomType(Closure|string|null $geomType): static
     {
-        return $this->evaluate($this->geoJsonProperty);
-    }
-
-    public function controls(Closure|array $controls): static
-    {
-        $this->controls = $controls;
+        $this->geomType = $geomType;
 
         return $this;
     }
 
-    public function getControls(): array
+    public function getGeomType(): string|null
     {
-        return $this->evaluate($this->controls);
+
+        return $this->evaluate($this->geomType);
+    }
+
+    public function geolocateOnLoad(Closure|bool $geolocateOnLoad = true, Closure|bool $always = false): static
+    {
+        $this->geolocateOnLoad = $geolocateOnLoad;
+        $this->geolocateOnLoadAlways = $always;
+
+        return $this;
+    }
+
+    public function getGeolocateOnLoad(): ?bool
+    {
+        if ($this->evaluate($this->geolocateOnLoad)) {
+            $always = $this->evaluate($this->geolocateOnLoadAlways);
+            $state = parent::getState();
+
+            if ($always || is_null($state)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function zoomToFeature(Closure|bool $bool = true): static
+    {
+        $this->zoomToFeature = $bool;
+
+        return $this;
+    }
+
+    public function getZoomToFeature(): bool
+    {
+        return $this->evaluate($this->zoomToFeature);
     }
 
     public function mapOptions(Closure|array $mapOptions): static
@@ -353,6 +297,21 @@ class Map extends Field
         return $this->evaluate($this->rectangleOptions);
     }
 
+    public function getState(): mixed
+    {
+        $state = parent::getState();
+
+        if (is_array($state)) {
+            return $state;
+        } else {
+            try {
+                return @json_decode($state, true, 512, JSON_THROW_ON_ERROR);
+            } catch (Exception $e) {
+                return null;
+            }
+        }
+    }
+
     public function baseLayers(Closure|array $layers): static
     {
         $this->baseLayers = $layers;
@@ -360,12 +319,11 @@ class Map extends Field
         return $this;
     }
 
-    /**
-     * @throws JsonException
-     */
     public function getBaseLayers(): array
     {
-        return $this->evaluate($this->baseLayers);
+        $baseLayers = $this->evaluate($this->baseLayers);
+
+        return empty($baseLayers) ? config('filament-map.config.baseLayers', []) : [];
     }
 
     public function layers(Closure|array $layers): static
@@ -375,19 +333,24 @@ class Map extends Field
         return $this;
     }
 
-    /**
-     * @throws JsonException
-     */
     public function getLayers(): array
     {
-        return $this->evaluate($this->layers);
+        $layers = $this->evaluate($this->layers);
+
+        return empty($layers) ? config('filament-map.config.layers', []) : [];
     }
 
-    protected function setUp(): void
+    public function controls(Closure|array $controls): static
     {
-        parent::setUp();
+        $this->controls = $controls;
+
+        return $this;
     }
 
+    public function getControls(): array
+    {
+        return array_merge(config('filament-map.config.controls', []), $this->evaluate($this->controls));
+    }
 
     /**
      * Create json configuration string
@@ -395,45 +358,23 @@ class Map extends Field
     public function getMapConfig(): string
     {
         $config = array_merge($this->mapConfig, [
-            'statePath'              => $this->getStatePath(),
-//            'autocomplete'           => $this->getAutocompleteId(),
-//            'types'                  => $this->getTypes(),
-//            'countries'              => $this->getCountries(),
-//            'placeField'             => $this->getPlaceField(),
-//            'autocompleteReverse'    => $this->getAutocompleteReverse(),
-//            'geolocate'              => $this->getGeolocate(),
-//            'geolocateLabel'         => $this->getGeolocateLabel(),
-//            'geolocateOnLoad'        => $this->getGeolocateOnLoad(),
-
-            'defaultCenter'        => $this->getDefaultCenter(),
-            'defaultZoom'            => $this->getDefaultZoom(),
-            'geomType'            => $this->getGeomType(),
-            'zoomToState'              => $this->getZoomToState(),
-            'controls'               => $this->getControls(),
-//            'drawingControl'         => $this->getDrawingControl(),
-//            'drawingControlPosition' => $this->getDrawingControlPosition(),
-//            'drawingModes'           => $this->getDrawingModes(),
-//            'drawingField'           => $this->getDrawingField(),
-            'baseLayers'                 => $this->getBaseLayers(),
-            'layers'                 => $this->getLayers(),
-//            'reverseGeocodeFields'   => $this->getReverseGeocode(),
-//            'reverseGeocodeUsing'    => $this->getReverseGeocodeUsing(),
-//            'placeUpdatedUsing'      => $this->getPlaceUpdatedUsing(),
-//            'defaultZoom'            => $this->getDefaultZoom(),
-//            'geoJson'                => $this->getGeoJsonFile(),
-            'latitudeField'           => $this->getLatitudeField(),
-            'longitudeField'           => $this->getLongitudeField(),
-            'geoJsonField'           => $this->getGeoJsonField(),
-            'geoJsonProperty'        => $this->getGeoJsonProperty(),
-//            'geoJsonVisible'         => $this->getGeoJsonVisible(),
-//            'debug'                  => $this->getDebug(),
-//            'gmaps'                  => MapsHelper::mapsUrl(false, $this->getDrawingControl() ? ['drawing'] : []),
-            'mapOptions'          => $this->getMapOptions(),
-            'markerOptions'          => $this->getMarkerOptions(),
-            'circleOptions'          => $this->getCircleOptions(),
-            'polylineOptions'            => $this->getPolylineOptions(),
-            'polygonOptions'            => $this->getPolygonOptions(),
-            'rectangleOptions'       => $this->getRectangeOptions(),
+            'statePath' => $this->getStatePath(),
+            'defaultCenter' => $this->getDefaultCenter(),
+            'defaultZoom' => $this->getDefaultZoom(),
+            'latitudeField' => $this->getLatitudeField(),
+            'longitudeField' => $this->getLongitudeField(),
+            'drawField' => $this->getDrawField(),
+            'geomType' => $this->getGeomType(),
+            'geolocateOnLoad' => $this->getGeolocateOnLoad(),
+            'mapOptions' => $this->getMapOptions(),
+            'markerOptions' => $this->getMarkerOptions(),
+            'circleOptions' => $this->getCircleOptions(),
+            'polylineOptions' => $this->getPolylineOptions(),
+            'polygonOptions' => $this->getPolygonOptions(),
+            'rectangleOptions' => $this->getRectangeOptions(),
+            'baseLayers' => $this->getBaseLayers(),
+            'layers' => $this->getLayers(),
+            'controls' => $this->getControls(),
         ]);
 
         return json_encode($config);
