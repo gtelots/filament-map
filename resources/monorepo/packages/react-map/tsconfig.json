@@ -1,15 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "esnext",
-    "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "noImplicitAny": true,
-    "allowJs": true,
-    "noEmit": true,
-    "resolveJsonModule": true,
+    "strict": true,
+    "noEmit": true
   }
 }

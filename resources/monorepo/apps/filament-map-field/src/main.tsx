@@ -1,7 +1,10 @@
 import { createRoot } from 'react-dom/client'
+import Alpine from 'alpinejs'
 
 import './main.scss'
 import App from './App'
+import { MapStoreProvider } from './useMapStore';
+import { cloneDeep, pick } from 'lodash';
 
 function filamentMapField(
   {
@@ -20,11 +23,15 @@ function filamentMapField(
       const appProps: any = {
         $wire: this['$wire'],
         $watch: this['$watch'],
-        state: this.state,
+        state: cloneDeep(Alpine.raw(this.state)),
         config
       }
 
-      root.render(<App {...appProps} />)
+      root.render((
+        <MapStoreProvider value={pick(appProps, ['$wire', 'state', 'config'])}>
+          <App {...appProps} />
+        </MapStoreProvider>
+      ))
     },
   }
 }

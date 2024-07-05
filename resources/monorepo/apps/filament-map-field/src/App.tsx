@@ -1,3 +1,7 @@
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
+import Alpine from 'alpinejs'
+import { map as _map, cloneDeep } from 'lodash'
+import { Fragment, useEffect, useRef } from 'react'
 import {
   AttributionControl,
   LayersControl,
@@ -6,14 +10,15 @@ import {
   TileLayer,
   ZoomControl,
 } from 'react-leaflet'
-import Alpine from 'alpinejs'
-import { Component, Fragment, useEffect, useRef } from 'react'
-import { map as _map } from 'lodash'
 import { GeomanControls } from 'react-leaflet-geoman-v2'
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-import { setDefaultIcon } from 'react-map'
+import { FullscreenControl, setDefaultIcon, toBounds, toLatLng } from 'react-map'
+import { feature as createFeature } from '@turf/helpers'
+import { isPoint } from 'geojson-validation'
+import { getGeom } from '@turf/invariant'
 
+import FeaturesManager from './FeaturesManager'
 import { TConfig } from './types'
+import useMapStore from './useMapStore'
 
 export type AppProps = {
   $wire: any
@@ -28,6 +33,7 @@ const controlComponents = {
   drawControl: GeomanControls,
   attributionControl: AttributionControl,
   scaleControl: ScaleControl,
+  fullscreenControl: FullscreenControl,
 }
 
 const defaultDrawControlOptions = {
@@ -56,14 +62,15 @@ function App(props: AppProps) {
     defaultZoom,
     latitudeField,
     longitudeField,
-    drawingField,
+    drawField,
     baseLayers,
     geomType,
     ...other
   } = config
 
+  const [setFeatures] = useMapStore(state => [state.setFeatures])
+
   const mapRef = useRef(null)
-  const rawState = Alpine.raw(state)
 
   const mapOptions = {
     style: {
@@ -80,16 +87,47 @@ function App(props: AppProps) {
   } as any
 
   useEffect(() => {
-    $watch('state', (value) => {})
+    $watch('state', (value) => {
+      console.log('watchState', value);
+
+      const map = mapRef.current as any
+      const geometry = cloneDeep(Alpine.raw(value))
+      const newFeature = createFeature(geometry)
+
+      setFeatures(newFeature)
+
+      if (isPoint(geometry)) {
+        map.panTo(toLatLng(geometry))
+      } else {
+        const bounds = toBounds(newFeature as any) as any
+        map.fitBounds(bounds)
+      }
+    })
   }, [])
 
-  const controls = _map(other.controls, (value, key) => {
-    const Component = controlComponents[key]
+  const handleCreate = (e) => {
+    e.target.removeLayer(e.layer)
+    setFeatures(e.layer.toGeoJSON())
+
+    const geometry = getGeom(e.layer.toGeoJSON())
+
+    if(isPoint(geometry)){
+      const latlng = toLatLng(geometry)
+      latitudeField && $wire.set(latitudeField, latlng[0], false)
+      longitudeField && $wire.set(longitudeField, latlng[1], false)
+    } else {
+      drawField && $wire.set(drawField, geometry, false)
+    }
+  }
+
+  const controls = _map(other.controls, ({ name, enabled, ...value }) => {
+    const Component = controlComponents[name]
+    if (!name || enabled == false || !Component) return null
+
     let options = { ...value }
-    if (!Component || !options) return null
     let children: any = null
 
-    if (key === 'layersControl') {
+    if (name === 'layersControl') {
       children = (
         <Fragment>
           {baseLayers?.map(
@@ -103,7 +141,7 @@ function App(props: AppProps) {
       )
     }
 
-    if (key === 'drawControl') {
+    if (name === 'drawControl') {
       options = {
         ...options,
         options: {
@@ -156,14 +194,18 @@ function App(props: AppProps) {
           rotateMode: true,
         }
       }
+
+      options.onCreate = handleCreate
     }
 
-    return <Component key={key} {...options} children={children} />
+    return <Component key={name} {...options} children={children} />
   }).filter((v) => v)
 
   return (
-    <MapContainer {...mapOptions}>
+    <MapContainer {...mapOptions} ref={mapRef}>
       {controls.map((control: any) => control)}
+
+      <FeaturesManager />
     </MapContainer>
   )
 }

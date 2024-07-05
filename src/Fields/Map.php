@@ -15,9 +15,9 @@ class Map extends Field
 
     protected int $precision = 8;
 
-    protected array|Closure|null $defaultCenter = [10.7578001, 106.6309967];
+    protected array|Closure|null $defaultCenter = null;
 
-    protected Closure|int|null $defaultZoom = 8;
+    protected Closure|int|null $defaultZoom = null;
 
     protected Closure|string|null $longitudeField = null;
 
@@ -120,7 +120,7 @@ class Map extends Field
     {
         $zoom = $this->evaluate($this->defaultZoom);
 
-        if($zoom >= 0) return $zoom;
+        if(is_numeric($zoom) && $zoom >= 0) return $zoom;
 
         return config('filament-map.config.mapOptions.zoom') ?? 0;
     }
@@ -366,6 +366,7 @@ class Map extends Field
             'drawField' => $this->getDrawField(),
             'geomType' => $this->getGeomType(),
             'geolocateOnLoad' => $this->getGeolocateOnLoad(),
+            'zoomToFeature' => $this->getZoomToFeature(),
             'mapOptions' => $this->getMapOptions(),
             'markerOptions' => $this->getMarkerOptions(),
             'circleOptions' => $this->getCircleOptions(),
