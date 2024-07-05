@@ -107,17 +107,20 @@ function App(props: AppProps) {
 
   const handleCreate = (e) => {
     e.target.removeLayer(e.layer)
-    setFeatures(e.layer.toGeoJSON())
+    setFeatures(getGeom(e.layer.toGeoJSON()))
 
-    const geometry = getGeom(e.layer.toGeoJSON())
+    // const geometry = getGeom(e.layer.toGeoJSON())
 
-    if(isPoint(geometry)){
-      const latlng = toLatLng(geometry)
-      latitudeField && $wire.set(latitudeField, latlng[0], false)
-      longitudeField && $wire.set(longitudeField, latlng[1], false)
-    } else {
-      drawField && $wire.set(drawField, geometry, false)
-    }
+    // console.log(geometry, e.layer.toGeoJSON());
+
+
+    // if(isPoint(geometry)){
+    //   const latlng = toLatLng(geometry)
+    //   latitudeField && $wire.set(latitudeField, latlng[0], false)
+    //   longitudeField && $wire.set(longitudeField, latlng[1], false)
+    // } else {
+    //   drawField && $wire.set(drawField, geometry, false)
+    // }
   }
 
   const controls = _map(other.controls, ({ name, enabled, ...value }) => {
