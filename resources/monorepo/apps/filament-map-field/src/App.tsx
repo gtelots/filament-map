@@ -130,9 +130,7 @@ function App(props: AppProps) {
           editMode: true,
           removalMode: true,
         }
-      }
-
-      if (['LineString', 'MultiLineString'].includes(geomType)) {
+      } else if (['LineString', 'MultiLineString'].includes(geomType)) {
         options.options = {
           ...options.options,
           drawPolyline: true,
@@ -142,13 +140,26 @@ function App(props: AppProps) {
           removalMode: true,
           rotateMode: true,
         }
-      }
-
-      if (['Polygon', 'MultiPolygon'].includes(geomType)) {
+      } else if (['Polygon', 'MultiPolygon'].includes(geomType)) {
         options.options = {
           ...options.options,
           drawRectangle: true,
           drawPolygon: true,
+          editMode: true,
+          dragMode: true,
+          cutPolygon: true,
+          removalMode: true,
+          rotateMode: true,
+        }
+      } else {
+        options.options = {
+          ...options.options,
+          drawCircle: true,
+          drawCircleMarker: true,
+          drawPolyline: true,
+          drawRectangle: true,
+          drawPolygon: true,
+
           editMode: true,
           dragMode: true,
           cutPolygon: true,
