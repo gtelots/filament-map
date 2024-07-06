@@ -1,3 +1,5 @@
 import './index.scss'
 
-export { default as setDefaultIcon } from './utils/setDefaultIcon'
+export * from './components'
+export * from './controls'
+export * from './utils'

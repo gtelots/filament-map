@@ -4,21 +4,24 @@ import { viteExternalsPlugin } from 'vite-plugin-externals'
 
 // https://vitejs.dev/config/
 // https://github.com/Accudio/async-alpine/issues/27
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name][extname]',
+export default defineConfig((env) => {
+  return {
+    build: {
+      minify: env.mode === 'production',
+      rollupOptions: {
+        output: {
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name].js',
+          assetFileNames: 'assets/[name][extname]',
+        },
       },
+      manifest: true,
     },
-    manifest: true,
-  },
-  plugins: [
-    react(),
-    viteExternalsPlugin({
-      alpinejs: 'Alpine',
-    }),
-  ],
+    plugins: [
+      react(),
+      viteExternalsPlugin({
+        alpinejs: 'Alpine',
+      }),
+    ],
+  }
 })

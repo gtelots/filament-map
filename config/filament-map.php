@@ -4,7 +4,7 @@ return [
     'config' => [
         'mapOptions' => [
             'center' => [10.7578001, 106.6309967],
-            'zoom' => 2
+            'zoom' => 9
         ],
         'baseLayers' => [
             [
@@ -21,31 +21,41 @@ return [
         ],
         'layers' => [],
         'controls' => [
-            'drawControl' => [
+            [
+                'name' => 'drawControl',
                 'position' => 'topleft',
-                'continueDrawing' => false,
-                'globalOptions' => [],
+                'globalOptions' => [
+                    'continueDrawing' => false,
+                ],
                 'drawModeOptions' => [],
                 'editModeOptions' => [],
                 'dragModeOptions' => [],
                 'removalModeOptions' => [],
             ],
-            'layersControl' => [
+            [
+                'name' => 'layersControl',
                 'position' => 'topright',
             ],
-            'locateControl' => [
+            [
+                'name' => 'locateControl',
                 'position' => 'bottomright',
             ],
-            'fullscreenControl' => [
+            [
+                'name' => 'attributionControl',
+                'position' => 'bottomright',
+            ],
+            [
+                'name' => 'fullscreenControl',
                 'position' => 'bottomright'
             ],
-            'attributionControl' => [
+            [
+                'name' => 'zoomControl',
                 'position' => 'bottomright',
             ],
-            'zoomControl' => [
-                'position' => 'bottomright',
+            [
+                'name' => 'scaleControl',
+                'enabled' => false,
             ],
-            'scaleControl' => false
         ]
     ]
 ];

@@ -11,4 +11,5 @@ export default defineConfig((opts: Options) => ({
   clean: true,
   treeshake: true,
   esbuildPlugins: [sassPlugin()],
+  injectStyle: false,
 }))
