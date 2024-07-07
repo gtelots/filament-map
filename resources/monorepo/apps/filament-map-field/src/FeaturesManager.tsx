@@ -1,4 +1,4 @@
-import { multiLineString, multiPoint, multiPolygon } from "@turf/helpers"
+import { geometryCollection, multiLineString, multiPoint, multiPolygon } from "@turf/helpers"
 import { getCoord, getCoords, getGeom } from '@turf/invariant'
 import { featureEach } from "@turf/meta"
 import { map as _map, last } from 'lodash'
@@ -70,6 +70,9 @@ function FeaturesManager() {
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
       } else if(geomType === 'MultiPolygon'){
         const geometry = getGeom(multiPolygon(_map(features, i => getCoords(i))))
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false)
+      } else if(geomType === 'GeometryCollection'){
+        const geometry = getGeom(geometryCollection(_map(features, i => getGeom(i))))
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
       }
     } else {

@@ -1,6 +1,7 @@
 import { nanoid } from '@reduxjs/toolkit'
-import { feature, lineString, point, polygon } from '@turf/helpers'
+import { feature, featureCollection, lineString, multiPoint, point, polygon } from '@turf/helpers'
 import { getCoords, getType } from '@turf/invariant'
+import { flattenEach } from '@turf/meta'
 
 function setFeaturesByState({ state, setFeatures }) {
   const type = getType(state)
@@ -33,6 +34,10 @@ function setFeaturesByState({ state, setFeatures }) {
         ...feature(state),
       },
     ])
+  } else if(type === 'GeometryCollection'){
+    let newFeatures = [] as any
+    flattenEach(state, (currentFeature) => newFeatures.push({id: nanoid(), ...currentFeature}))
+    setFeatures(newFeatures)
   }
 }
 
