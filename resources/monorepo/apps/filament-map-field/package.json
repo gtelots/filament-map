@@ -16,6 +16,7 @@
     "@turf/circle": "^7.0.0",
     "@turf/helpers": "^7.0.0",
     "@turf/invariant": "^7.0.0",
+    "@turf/meta": "^7.0.0",
     "@turf/point-on-feature": "^7.0.0",
     "alpinejs": "^3.14.1",
     "geojson-validation": "^1.0.2",

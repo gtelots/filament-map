@@ -1,9 +1,11 @@
-import { createEntityAdapter } from '@reduxjs/toolkit'
+import { createEntityAdapter, nanoid } from '@reduxjs/toolkit'
 import { createContext, useContext, useRef } from 'react'
 import { createStore, useStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { TConfig } from './types'
 import { castArray } from 'lodash'
+import { multiLineString, multiPoint, multiPolygon } from "@turf/helpers";
+import { getCoord, getCoords, getGeom } from "@turf/invariant";
 
 type MapState = {
   $wire: any
@@ -28,11 +30,21 @@ const initialState: MapState = featuresAdapter.getInitialState({
 }) satisfies MapState as MapState
 
 const actions = (set: any, get: any) => ({
-  setFeatures: (features) => {
-    set(state => {
-      featuresAdapter.setAll(state, castArray(features))
-    })
-  },
+  addFeature: (feature) => set(state => {
+    featuresAdapter.addOne(state, {id: nanoid(), ...feature})
+  }),
+
+  removeFeature: (id: string) => set(state => {
+    featuresAdapter.removeOne(state, id)
+  }),
+
+  setFeatures: (features) => set(state => {
+    featuresAdapter.setAll(state, features)
+  }),
+
+  removeFeatures: () => set(state => {
+    featuresAdapter.removeAll(state)
+  })
 }) as MapActions
 
 const MapStoreContext = createContext(null)
@@ -40,10 +52,10 @@ const MapStoreContext = createContext(null)
 export const MapStoreProvider = ({ children, value }) => {
   const storeRef = useRef<any>()
   if (!storeRef.current) {
-    storeRef.current = createStore<MapState & MapActions>()(immer((set) => ({
+    storeRef.current = createStore<MapState & MapActions>()(immer((set, get) => ({
       ...initialState,
       ...value,
-      ...actions(set, set),
+      ...actions(set, get),
       reset: () => ({
         ...initialState,
         ...value,

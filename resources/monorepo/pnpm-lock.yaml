@@ -160,6 +160,9 @@ importers:
       '@turf/invariant':
         specifier: ^7.0.0
         version: 7.0.0
+      '@turf/meta':
+        specifier: ^7.0.0
+        version: 7.0.0
       '@turf/point-on-feature':
         specifier: ^7.0.0
         version: 7.0.0
@@ -235,7 +238,7 @@ importers:
         version: 5.5.3
       vite:
         specifier: ^5.3.2
-        version: 5.3.3(sass@1.77.6)
+        version: 5.3.3
       vite-plugin-externals:
         specifier: ^0.6.2
         version: 0.6.2(vite@5.3.3)
@@ -1617,7 +1620,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.24.7)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.3.3(sass@1.77.6)
+      vite: 5.3.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4028,7 +4031,42 @@ packages:
       es-module-lexer: 0.4.1
       fs-extra: 10.1.0
       magic-string: 0.25.9
-      vite: 5.3.3(sass@1.77.6)
+      vite: 5.3.3
+    dev: true
+
+  /vite@5.3.3:
+    resolution: {integrity: sha512-NPQdeCU0Dv2z5fu+ULotpuq5yfCS1BzKUIPhNbP3YBfAMGJXbt2nS+sbTFu+qchaqWTD+H3JK++nRwr6XIcp6A==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^18.0.0 || >=20.0.0
+      less: '*'
+      lightningcss: ^1.21.0
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.21.5
+      postcss: 8.4.39
+      rollup: 4.18.0
+    optionalDependencies:
+      fsevents: 2.3.3
     dev: true
 
   /vite@5.3.3(sass@1.77.6):

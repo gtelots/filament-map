@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
+import { multiLineString, multiPoint, multiPolygon } from "@turf/helpers"
+import { getCoord, getCoords, getGeom } from '@turf/invariant'
+import { featureEach } from "@turf/meta"
+import { map as _map, last } from 'lodash'
+import { useEffect } from 'react'
+import { useMap } from 'react-leaflet'
+import { GeoJSON } from 'react-map'
+import { useUpdateEffect } from 'react-use'
 import useMapStore, { featuresSelectors } from './useMapStore'
-import { GeoJSON, toBounds, toLatLng } from 'react-map';
-import { isGeoJSONObject, isPoint } from 'geojson-validation'
-import { getCoord, getGeom } from '@turf/invariant'
-import { useMap } from 'react-leaflet';
-import { pointOnFeature } from '@turf/point-on-feature'
-import { bbox } from '@turf/bbox'
-import { circle } from "@turf/circle";
-import FeatureState from './FeatureState';
-import { useUpdateEffect } from 'react-use';
+import setFeaturesByState from './utils/setFeaturesByState'
+import zoomToFeatureByState from './utils/zoomToFeatureByState'
 
 function FeaturesManager() {
   const map = useMap()
@@ -21,7 +21,7 @@ function FeaturesManager() {
     drawField,
     zoomToFeature,
     features,
-    setFeatures
+    setFeatures,
   ] = useMapStore((state: any) => [
     state.state,
     state.$wire,
@@ -35,62 +35,67 @@ function FeaturesManager() {
   ])
 
   useEffect(() => {
-    if(!state) return
+    if (!state) return
 
-    setFeatures(state)
+    setFeaturesByState({
+      state,
+      setFeatures
+    })
 
-    const geometry = getGeom(state as any)
-
-    if(isPoint(geometry)) {
-      if(zoomToFeature) {
-        const bounds = toBounds(circle(state, 0.25, { steps: 4 })) as any
-        map.fitBounds(bounds, { animate: false })
-      } else {
-        map.panTo(toLatLng(state), { animate: false })
-      }
-
-      return;
-    }
-
-    if(isGeoJSONObject(geometry)){
-      if(zoomToFeature) {
-        const bounds = toBounds(state) as any
-        map.fitBounds(bounds, { animate: false })
-      } else {
-        map.panTo(toLatLng(pointOnFeature(state)))
-      }
-    }
+    zoomToFeatureByState({
+      state,
+      config: {zoomToFeature},
+      map
+    })
+    
   }, [])
 
   useUpdateEffect(() => {
-    if(features?.length) {
-      if(geomType === 'Point'){
-        const coords = getCoord(features[0])
+    if (features?.length) {
+      if(['Point', 'LineString', 'Polygon'].includes(geomType)){
+        const geometry = getGeom(last(features) as any)
 
-        latitudeField && $wire.set(latitudeField, coords[1], false)
-        longitudeField && $wire.set(longitudeField, coords[0], false)
-        drawField && $wire.set(drawField, JSON.stringify(features[0]), false)
+        if(geomType === 'Point'){
+          const coords = getCoord(geometry)
+          latitudeField && $wire.set(latitudeField, coords[1], false)
+          longitudeField && $wire.set(longitudeField, coords[0], false)
+        }
+
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false)
+      } else if(geomType === 'MultiPoint'){
+        const geometry = getGeom(multiPoint(_map(features, i => getCoord(i))))
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false)
+      } else if(geomType === 'MultiLineString'){
+        const geometry = getGeom(multiLineString(_map(features, i => getCoords(i))))
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false)
+      } else if(geomType === 'MultiPolygon'){
+        const geometry = getGeom(multiPolygon(_map(features, i => getCoords(i))))
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false)
       }
+    } else {
+      drawField && $wire.set(drawField, '', false)
     }
-
   }, [JSON.stringify(features)])
-
-
 
   return features?.map((f, k) => (
     <GeoJSON
       key={k}
       data={f}
-      eventHandlers={{
-        'pm:update': ({ layer }) => {
-          const geometry = getGeom(layer.toGeoJSON())
-
-          setFeatures(geometry)
-        }
-      } as any}
+      eventHandlers={
+        {
+          'pm:update': ({ layer, target }) => {
+            featureEach(target.toGeoJSON(), (feature, index) => {
+              const geometry = getGeom(feature)
+              setFeatures(geometry)
+            })
+          },
+          'layer:remove': (...args) => {
+            console.log(args);
+          },
+        } as any
+      }
     />
   ))
 }
 
 export default FeaturesManager
-

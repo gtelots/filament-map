@@ -11,14 +11,13 @@ import {
   ZoomControl,
 } from 'react-leaflet'
 import { GeomanControls } from 'react-leaflet-geoman-v2'
-import { FullscreenControl, setDefaultIcon, toBounds, toLatLng } from 'react-map'
-import { feature as createFeature } from '@turf/helpers'
-import { isPoint } from 'geojson-validation'
-import { getGeom } from '@turf/invariant'
+import { FullscreenControl, setDefaultIcon } from 'react-map'
 
 import FeaturesManager from './FeaturesManager'
 import { TConfig } from './types'
 import useMapStore from './useMapStore'
+import setFeaturesByState from './utils/setFeaturesByState'
+import zoomToFeatureByState from './utils/zoomToFeatureByState'
 
 export type AppProps = {
   $wire: any
@@ -65,10 +64,18 @@ function App(props: AppProps) {
     drawField,
     baseLayers,
     geomType,
+    zoomToFeature,
     ...other
   } = config
 
-  const [setFeatures] = useMapStore(state => [state.setFeatures])
+  const [addFeature, setFeatures, removeFeature, removeFeatures] = useMapStore(
+    (state) => [
+      state.addFeature,
+      state.setFeatures,
+      state.removeFeature,
+      state.removeFeatures,
+    ],
+  )
 
   const mapRef = useRef(null)
 
@@ -82,45 +89,49 @@ function App(props: AppProps) {
     center: defaultCenter,
     zoom: defaultZoom,
     whenReady: ({ target: map }) => {
-      setTimeout(() => map.invalidateSize(), 100)
+      setTimeout(() => {
+        map.invalidateSize()
+      }, 100)
     },
   } as any
 
   useEffect(() => {
     $watch('state', (value) => {
-      console.log('watchState', value);
+      console.log('watchState', value)
+
+      if (!value) {
+        removeFeatures()
+        return
+      }
 
       const map = mapRef.current as any
-      const geometry = cloneDeep(Alpine.raw(value))
-      const newFeature = createFeature(geometry)
+      const state = cloneDeep(Alpine.raw(value))
 
-      setFeatures(newFeature)
+      setFeaturesByState({
+        state,
+        setFeatures,
+      })
 
-      if (isPoint(geometry)) {
-        map.panTo(toLatLng(geometry))
-      } else {
-        const bounds = toBounds(newFeature as any) as any
-        map.fitBounds(bounds)
-      }
+      zoomToFeatureByState({
+        state,
+        config: { zoomToFeature },
+        map,
+      })
     })
   }, [])
 
   const handleCreate = (e) => {
     e.target.removeLayer(e.layer)
-    setFeatures(getGeom(e.layer.toGeoJSON()))
 
-    // const geometry = getGeom(e.layer.toGeoJSON())
+    if (['Point', 'LineString', 'Polygon'].includes(geomType)) removeFeatures()
 
-    // console.log(geometry, e.layer.toGeoJSON());
+    addFeature(e.layer.toGeoJSON())
+  }
 
+  const handleRemove = ({ layer, target }) => {
+    const id = layer.feature.id
 
-    // if(isPoint(geometry)){
-    //   const latlng = toLatLng(geometry)
-    //   latitudeField && $wire.set(latitudeField, latlng[0], false)
-    //   longitudeField && $wire.set(longitudeField, latlng[1], false)
-    // } else {
-    //   drawField && $wire.set(drawField, geometry, false)
-    // }
+    id && removeFeature(id)
   }
 
   const controls = _map(other.controls, ({ name, enabled, ...value }) => {
@@ -195,8 +206,8 @@ function App(props: AppProps) {
       } else {
         options.options = {
           ...options.options,
+          drawMarker: true,
           drawCircle: true,
-          drawCircleMarker: true,
           drawPolyline: true,
           drawRectangle: true,
           drawPolygon: true,
@@ -210,6 +221,7 @@ function App(props: AppProps) {
       }
 
       options.onCreate = handleCreate
+      options.onMapRemove = handleRemove
     }
 
     return <Component key={name} {...options} children={children} />
