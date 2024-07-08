@@ -1,7 +1,7 @@
 import { geometryCollection, multiLineString, multiPoint, multiPolygon } from "@turf/helpers"
-import { getCoord, getCoords, getGeom } from '@turf/invariant'
+import { getCoord, getCoords, getGeom, getType } from '@turf/invariant'
 import { featureEach } from "@turf/meta"
-import { map as _map, last } from 'lodash'
+import { map as _map, get, last } from 'lodash'
 import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 import { GeoJSON } from 'react-map'
@@ -23,6 +23,7 @@ function FeaturesManager() {
     features,
     updateFeature,
     setFeatures,
+    removeFeature,
   ] = useMapStore((state: any) => [
     state.state,
     state.$wire,
@@ -34,6 +35,7 @@ function FeaturesManager() {
     featuresSelectors.selectAll(state),
     state.updateFeature,
     state.setFeatures,
+    state.removeFeature,
   ])
 
   useEffect(() => {
@@ -54,7 +56,7 @@ function FeaturesManager() {
 
   useUpdateEffect(() => {
     if (features?.length) {
-      if(['Point', 'LineString', 'Polygon'].includes(geomType)){
+      if(['Point', 'LineString', 'Polygon'].includes(geomType) && features?.length === 1){
         const geometry = getGeom(last(features) as any)
 
         if(geomType === 'Point'){
@@ -96,6 +98,21 @@ function FeaturesManager() {
               })
             })
           },
+
+          'pm:cut': (e) => {
+            map.removeLayer(e.layer);
+
+            const id = get(e, 'originalLayer.feature.id');
+            removeFeature(id)
+
+            const type = getType(e.layer.toGeoJSON())
+            const geometry = getGeom((type === geomType) ? (e.layer.toGeoJSON()) : (e.originalLayer.toGeoJSON()))
+
+            setFeaturesByState({
+              state: geometry,
+              setFeatures
+            })
+          }
         } as any
       }
     />
