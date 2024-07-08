@@ -21,6 +21,7 @@ function FeaturesManager() {
     drawField,
     zoomToFeature,
     features,
+    updateFeature,
     setFeatures,
   ] = useMapStore((state: any) => [
     state.state,
@@ -31,6 +32,7 @@ function FeaturesManager() {
     state.config.drawField,
     state.config.zoomToFeature,
     featuresSelectors.selectAll(state),
+    state.updateFeature,
     state.setFeatures,
   ])
 
@@ -47,7 +49,7 @@ function FeaturesManager() {
       config: {zoomToFeature},
       map
     })
-    
+
   }, [])
 
   useUpdateEffect(() => {
@@ -88,12 +90,11 @@ function FeaturesManager() {
         {
           'pm:update': ({ layer, target }) => {
             featureEach(target.toGeoJSON(), (feature, index) => {
-              const geometry = getGeom(feature)
-              setFeatures(geometry)
+              updateFeature({
+                id: feature.id,
+                changes: feature
+              })
             })
-          },
-          'layer:remove': (...args) => {
-            console.log(args);
           },
         } as any
       }

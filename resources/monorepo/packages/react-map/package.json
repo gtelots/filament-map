@@ -1,12 +1,21 @@
 {
   "name": "react-map",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
   "sideEffects": false,
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./dist/": {
       "import": "./dist/",
@@ -41,6 +50,7 @@
     "react-dom": ">=18"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ]
 }

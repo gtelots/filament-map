@@ -34,6 +34,10 @@ const actions = (set: any, get: any) => ({
     featuresAdapter.addOne(state, {id: nanoid(), ...feature})
   }),
 
+  updateFeature: (payload) => set(state => {
+    featuresAdapter.updateOne(state, payload)
+  }),
+
   removeFeature: (id: string) => set(state => {
     featuresAdapter.removeOne(state, id)
   }),
