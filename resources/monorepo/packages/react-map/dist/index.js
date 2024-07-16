@@ -1,17 +1,31 @@
 import { createPathComponent, createElementObject, extendContext, createControlComponent } from '@react-leaflet/core';
-import p, { GeoJSON, Control } from 'leaflet';
+import ae, { GeoJSON, Control } from 'leaflet';
+import { point, lineString, polygon, feature, multiPoint, multiLineString, multiPolygon, geometryCollection } from '@turf/helpers';
+import { getType, getCoords, getCoord, getGeom } from '@turf/invariant';
+import { flattenEach, featureEach } from '@turf/meta';
+import { last, map, get } from 'lodash';
+import { createContext, useRef, useContext, useEffect, Fragment } from 'react';
+import { useMap, LayersControl, TileLayer, ZoomControl, AttributionControl, ScaleControl } from 'react-leaflet';
+import { createEntityAdapter, nanoid } from '@reduxjs/toolkit';
+import { createStore, useStore } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { jsx } from 'react/jsx-runtime';
+import { useUpdateEffect } from 'react-use';
+import { circle } from '@turf/circle';
+import { pointOnFeature } from '@turf/point-on-feature';
+import { isPoint, isGeoJSONObject } from 'geojson-validation';
+import le from 'leaflet/dist/images/marker-icon.png';
+import ie from 'leaflet/dist/images/marker-icon-2x.png';
+import se from 'leaflet/dist/images/marker-shadow.png';
+import me from '@turf/center';
+import fe from '@turf/flip';
+import { bbox } from '@turf/bbox';
+import { GeomanControls } from 'react-leaflet-geoman-v2';
 import 'leaflet.fullscreen';
 import 'leaflet.fullscreen/Control.FullScreen.css';
-import u from 'leaflet/dist/images/marker-icon.png';
-import G from 'leaflet/dist/images/marker-icon-2x.png';
-import f from 'leaflet/dist/images/marker-shadow.png';
-import { getCoord } from '@turf/invariant';
-import y from '@turf/center';
-import C from '@turf/flip';
-import { bbox } from '@turf/bbox';
 
-var d=createPathComponent(function({data:t,...e},r){let l=new GeoJSON(t,e);return createElementObject(l,extendContext(r,{overlayContainer:l}))},function(t,e,r){e.data!==r.data&&t.clearLayers().addData(e.data),e.style!==r.style&&(e.style==null?t.resetStyle():t.setStyle(e.style));});var s=createControlComponent(function(t){return new Control.FullScreen(t)});function J(o={}){p.Icon.Default.mergeOptions({iconUrl:u,iconRetinaUrl:G,shadowUrl:f,...o});}var X=J;function x(o){return o&&getCoord(C(y(o)))}var W=x;function h(o){let t=bbox(o);return [[t[1],t[0]],[t[3],t[2]]]}var I=h;
+var h=createPathComponent(function({data:n,...t},r){let l=new GeoJSON(n,t);return createElementObject(l,extendContext(r,{overlayContainer:l}))},function(n,t,r){t.data!==r.data&&n.clearLayers().addData(t.data),t.style!==r.style&&(t.style==null?n.resetStyle():n.setStyle(t.style));});var f=createEntityAdapter(),R=f.getSelectors(e=>e),W=f.getInitialState({$wire:null,$watch:null,state:null,config:{}}),D=(e,n)=>({addFeature:t=>e(r=>{f.addOne(r,{id:nanoid(),...t});}),updateFeature:t=>e(r=>{f.updateOne(r,t);}),removeFeature:t=>e(r=>{f.removeOne(r,t);}),setFeatures:t=>e(r=>{f.setAll(r,t);}),removeFeatures:()=>e(t=>{f.removeAll(t);})}),I=createContext(null),$=({children:e,value:n})=>{let t=useRef();return t.current||(t.current=createStore()(immer((r,l)=>({...W,...n,...D(r),reset:()=>({...W,...n})})))),jsx(I.Provider,{value:t.current,children:e})},g=e=>{let n=useContext(I);if(!n)throw new Error("Missing MapStoreProvider");return useStore(n,e)};function ne({state:e,setFeatures:n}){let t=getType(e);if(t==="MultiPoint")n(getCoords(e).map(r=>({id:nanoid(),...point(r)})));else if(t==="MultiLineString")n(getCoords(e).map(r=>({id:nanoid(),...lineString(r)})));else if(t==="MultiPolygon")n(getCoords(e).map(r=>({id:nanoid(),...polygon(r)})));else if(["Point","LineString","Polygon"].includes(t))n([{id:nanoid(),...feature(e)}]);else if(t==="GeometryCollection"){let r=[];flattenEach(e,l=>r.push({id:nanoid(),...l})),n(r);}}var S=ne;function ce(e={}){ae.Icon.Default.mergeOptions({iconUrl:le,iconRetinaUrl:ie,shadowUrl:se,...e});}var ue=ce;function pe(e){return e&&getCoord(fe(me(e)))}var x=pe;function ge(e){let n=bbox(e);return [[n[1],n[0]],[n[3],n[2]]]}var F=ge;function xe({state:e,config:{zoomToFeature:n},map:t}){let r=getGeom(e);if(isPoint(r)){if(n){let l=F(circle(e,.25,{steps:4}));t.fitBounds(l,{animate:!1});}else t.panTo(x(e),{animate:!1});return}if(isGeoJSONObject(r))if(n){let l=F(e);t.fitBounds(l,{animate:!1});}else t.panTo(x(pointOnFeature(e)));}var O=xe;function Ye(){let e=useMap(),[n,t,r,l,C,s,X,c,a,u,m]=g(o=>[o.state,o.$wire,o.config.geomType,o.config.latitudeField,o.config.longitudeField,o.config.drawField,o.config.zoomToFeature,R.selectAll(o),o.updateFeature,o.setFeatures,o.removeFeature]);return useEffect(()=>{n&&(S({state:n,setFeatures:u}),O({state:n,config:{zoomToFeature:X},map:e}));},[]),useUpdateEffect(()=>{if(c?.length){if(["Point","LineString","Polygon"].includes(r)&&c?.length===1){let o=getGeom(last(c));if(r==="Point"){let i=getCoord(o);l&&t.set(l,i[1],!1),C&&t.set(C,i[0],!1);}s&&t.set(s,JSON.stringify(o),!1);}else if(r==="MultiPoint"){let o=getGeom(multiPoint(map(c,i=>getCoord(i))));s&&t.set(s,JSON.stringify(o),!1);}else if(r==="MultiLineString"){let o=getGeom(multiLineString(map(c,i=>getCoords(i))));s&&t.set(s,JSON.stringify(o),!1);}else if(r==="MultiPolygon"){let o=getGeom(multiPolygon(map(c,i=>getCoords(i))));s&&t.set(s,JSON.stringify(o),!1);}else if(r==="GeometryCollection"){let o=getGeom(geometryCollection(map(c,i=>getGeom(i))));s&&t.set(s,JSON.stringify(o),!1);}}else s&&t.set(s,"",!1);},[JSON.stringify(c)]),c?.map((o,i)=>jsx(h,{data:o,eventHandlers:{"pm:update":({layer:d,target:b})=>{featureEach(b.toGeoJSON(),(y,J)=>{a({id:y.id,changes:y});});},"pm:cut":d=>{e.removeLayer(d.layer);let b=get(d,"originalLayer.feature.id");m(b);let y=getType(d.layer.toGeoJSON()),J=getGeom(y===r?d.layer.toGeoJSON():d.originalLayer.toGeoJSON());S({state:J,setFeatures:u});}}},i))}var we=Ye;var v=createControlComponent(function(n){return new Control.FullScreen(n)});var Te={zoomControl:ZoomControl,layersControl:LayersControl,drawControl:GeomanControls,attributionControl:AttributionControl,scaleControl:ScaleControl,fullscreenControl:v},Ee={drawMarker:!0,drawCircle:!1,drawCircleMarker:!1,drawPolyline:!1,drawRectangle:!1,drawPolygon:!1,drawText:!1,editMode:!0,dragMode:!1,cutPolygon:!1,removalMode:!0,rotateMode:!1};function He(){let[e,n,t]=g(a=>[a.config.geomType,a.config.baseLayers,a.config.controls]),[r,l,C]=g(a=>[a.addFeature,a.removeFeature,a.removeFeatures]),s=a=>{a.target.removeLayer(a.layer),["Point","LineString","Polygon"].includes(e)&&C(),r(a.layer.toGeoJSON());},X=({layer:a,target:u})=>{let m=a.feature.id;m&&l(m);};return map(t,(a,u)=>{let m=Te[u];if(!a||a?.enabled==!1||!m)return null;console.log(u);let o={...a},i=null;return u==="layersControl"&&(i=jsx(Fragment,{children:n?.map(({selected:d=!1,title:b="None",...y},J)=>jsx(LayersControl.BaseLayer,{name:b,checked:d,children:jsx(TileLayer,{url:"",...y})},J))})),u==="drawControl"&&(o={...o,options:Ee},["Point","MultiPoint"].includes(e)?o.options={...o.options,drawMarker:!0,editMode:!0,removalMode:!0}:["LineString","MultiLineString"].includes(e)?o.options={...o.options,drawPolyline:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0}:["Polygon","MultiPolygon"].includes(e)?o.options={...o.options,drawRectangle:!0,drawPolygon:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0}:o.options={...o.options,drawMarker:!0,drawCircle:!0,drawPolyline:!0,drawRectangle:!0,drawPolygon:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0},o.onCreate=s,o.onMapRemove=X),jsx(m,{...o,children:i},u)}).filter(a=>a).map(a=>a)}var De=He;
 
-export { s as FullscreenControl, d as GeoJSON, X as setDefaultIcon, I as toBounds, W as toLatLng };
+export { De as ControlManager, we as FeatureManager, v as FullscreenControl, h as GeoJSON, $ as MapStoreProvider, R as featuresSelectors, ue as setDefaultIcon, S as setFeaturesByState, F as toBounds, x as toLatLng, g as useMapStore, O as zoomToFeatureByState };
 //# sourceMappingURL=out.js.map
 //# sourceMappingURL=index.js.map

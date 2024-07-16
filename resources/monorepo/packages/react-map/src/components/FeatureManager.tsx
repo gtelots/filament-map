@@ -1,16 +1,21 @@
-import { geometryCollection, multiLineString, multiPoint, multiPolygon } from "@turf/helpers"
+import {
+  geometryCollection,
+  multiLineString,
+  multiPoint,
+  multiPolygon,
+} from '@turf/helpers'
 import { getCoord, getCoords, getGeom, getType } from '@turf/invariant'
-import { featureEach } from "@turf/meta"
+import { featureEach } from '@turf/meta'
 import { map as _map, get, last } from 'lodash'
 import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
-import { GeoJSON } from 'react-map'
+import { featuresSelectors, useMapStore } from '../hooks/useMapStore'
 import { useUpdateEffect } from 'react-use'
-import useMapStore, { featuresSelectors } from './useMapStore'
-import setFeaturesByState from './utils/setFeaturesByState'
-import zoomToFeatureByState from './utils/zoomToFeatureByState'
+import setFeaturesByState from '../utils/setFeaturesByState'
+import zoomToFeatureByState from '../utils/zoomToFeatureByState'
+import { GeoJSON } from '../components/GeoJSON'
 
-function FeaturesManager() {
+function FeatureManager() {
   const map = useMap()
   const [
     state,
@@ -43,40 +48,48 @@ function FeaturesManager() {
 
     setFeaturesByState({
       state,
-      setFeatures
+      setFeatures,
     })
 
     zoomToFeatureByState({
       state,
-      config: {zoomToFeature},
-      map
+      config: { zoomToFeature },
+      map,
     })
-
   }, [])
 
   useUpdateEffect(() => {
     if (features?.length) {
-      if(['Point', 'LineString', 'Polygon'].includes(geomType) && features?.length === 1){
+      if (
+        ['Point', 'LineString', 'Polygon'].includes(geomType) &&
+        features?.length === 1
+      ) {
         const geometry = getGeom(last(features) as any)
 
-        if(geomType === 'Point'){
+        if (geomType === 'Point') {
           const coords = getCoord(geometry)
           latitudeField && $wire.set(latitudeField, coords[1], false)
           longitudeField && $wire.set(longitudeField, coords[0], false)
         }
 
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
-      } else if(geomType === 'MultiPoint'){
-        const geometry = getGeom(multiPoint(_map(features, i => getCoord(i))))
+      } else if (geomType === 'MultiPoint') {
+        const geometry = getGeom(multiPoint(_map(features, (i) => getCoord(i))))
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
-      } else if(geomType === 'MultiLineString'){
-        const geometry = getGeom(multiLineString(_map(features, i => getCoords(i))))
+      } else if (geomType === 'MultiLineString') {
+        const geometry = getGeom(
+          multiLineString(_map(features, (i) => getCoords(i))),
+        )
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
-      } else if(geomType === 'MultiPolygon'){
-        const geometry = getGeom(multiPolygon(_map(features, i => getCoords(i))))
+      } else if (geomType === 'MultiPolygon') {
+        const geometry = getGeom(
+          multiPolygon(_map(features, (i) => getCoords(i))),
+        )
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
-      } else if(geomType === 'GeometryCollection'){
-        const geometry = getGeom(geometryCollection(_map(features, i => getGeom(i))))
+      } else if (geomType === 'GeometryCollection') {
+        const geometry = getGeom(
+          geometryCollection(_map(features, (i) => getGeom(i))),
+        )
         drawField && $wire.set(drawField, JSON.stringify(geometry), false)
       }
     } else {
@@ -94,29 +107,33 @@ function FeaturesManager() {
             featureEach(target.toGeoJSON(), (feature, index) => {
               updateFeature({
                 id: feature.id,
-                changes: feature
+                changes: feature,
               })
             })
           },
 
           'pm:cut': (e) => {
-            map.removeLayer(e.layer);
+            map.removeLayer(e.layer)
 
-            const id = get(e, 'originalLayer.feature.id');
+            const id = get(e, 'originalLayer.feature.id')
             removeFeature(id)
 
             const type = getType(e.layer.toGeoJSON())
-            const geometry = getGeom((type === geomType) ? (e.layer.toGeoJSON()) : (e.originalLayer.toGeoJSON()))
+            const geometry = getGeom(
+              type === geomType
+                ? e.layer.toGeoJSON()
+                : e.originalLayer.toGeoJSON(),
+            )
 
             setFeaturesByState({
               state: geometry,
-              setFeatures
+              setFeatures,
             })
-          }
+          },
         } as any
       }
     />
   ))
 }
 
-export default FeaturesManager
+export default FeatureManager

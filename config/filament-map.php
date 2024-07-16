@@ -21,41 +21,38 @@ return [
         ],
         'layers' => [],
         'controls' => [
-            [
-                'name' => 'drawControl',
-                'position' => 'topleft',
-                'globalOptions' => [
-                    'continueDrawing' => false,
-                ],
-                'drawModeOptions' => [],
-                'editModeOptions' => [],
-                'dragModeOptions' => [],
-                'removalModeOptions' => [],
-            ],
-            [
-                'name' => 'layersControl',
+            'layersControl' => [
                 'position' => 'topright',
             ],
-            [
-                'name' => 'locateControl',
+            'locateControl' => [
                 'position' => 'bottomright',
             ],
-            [
-                'name' => 'attributionControl',
+            'attributionControl' => [
                 'position' => 'bottomright',
             ],
-            [
-                'name' => 'fullscreenControl',
+            'fullscreenControl' => [
                 'position' => 'bottomright'
             ],
-            [
-                'name' => 'zoomControl',
+            'zoomControl' => [
                 'position' => 'bottomright',
             ],
-            [
-                'name' => 'scaleControl',
-                'enabled' => false,
+            'scaleControl' => false,
+        ],
+        'controlCases' => [
+            'MapField' => [
+                'drawControl' => [
+                    'position' => 'topleft',
+                    'globalOptions' => [
+                        'continueDrawing' => false,
+                    ],
+                    'drawModeOptions' => [],
+                    'editModeOptions' => [],
+                    'dragModeOptions' => [],
+                    'removalModeOptions' => [],
+                ]
             ],
+            'MapEntry' => [],
+            'MapWidget' => []
         ]
     ]
 ];

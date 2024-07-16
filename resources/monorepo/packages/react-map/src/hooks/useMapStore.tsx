@@ -2,16 +2,12 @@ import { createEntityAdapter, nanoid } from '@reduxjs/toolkit'
 import { createContext, useContext, useRef } from 'react'
 import { createStore, useStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { TConfig } from './types'
-import { castArray } from 'lodash'
-import { multiLineString, multiPoint, multiPolygon } from "@turf/helpers";
-import { getCoord, getCoords, getGeom } from "@turf/invariant";
 
 type MapState = {
   $wire: any
   $watch: any
   state: any
-  config: TConfig
+  config: Record<string, any>
 }
 
 type MapActions = {

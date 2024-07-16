@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import useMapStore from "./useMapStore";
+import { useMapStore } from "react-map";
 
-function LayersManager(){
+function LayerManager(){
   const layers = useMapStore(state => state.config.layers)
   const setConfig = useMapStore(state => state.setConfig)
 
@@ -20,4 +20,4 @@ function LayersManager(){
   return null;
 }
 
-export default LayersManager
+export default LayerManager

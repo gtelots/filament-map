@@ -3,8 +3,8 @@ import Alpine from 'alpinejs'
 
 import './main.scss'
 import App from './App'
-import { MapStoreProvider } from './useMapStore';
 import { cloneDeep, pick } from 'lodash';
+import { MapStoreProvider } from 'react-map';
 
 function filamentMapField(
   {

@@ -1,5 +1,5 @@
 import { nanoid } from '@reduxjs/toolkit'
-import { feature, featureCollection, lineString, multiPoint, point, polygon } from '@turf/helpers'
+import { feature, lineString, point, polygon } from '@turf/helpers'
 import { getCoords, getType } from '@turf/invariant'
 import { flattenEach } from '@turf/meta'
 

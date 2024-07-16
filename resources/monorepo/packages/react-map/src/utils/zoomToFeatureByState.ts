@@ -3,7 +3,7 @@ import { circle } from '@turf/circle'
 import { getGeom } from '@turf/invariant'
 import { pointOnFeature } from '@turf/point-on-feature'
 import { isGeoJSONObject, isPoint } from 'geojson-validation'
-import { toBounds, toLatLng } from 'react-map'
+import { toBounds, toLatLng } from '../utils'
 
 function zoomToFeatureByState({
   state,

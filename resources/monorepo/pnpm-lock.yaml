@@ -84,9 +84,18 @@ importers:
 
   apps/filament-map-entry:
     dependencies:
+      '@geoman-io/leaflet-geoman-free':
+        specifier: ^2.17.0
+        version: 2.17.0(leaflet@1.9.4)
+      alpinejs:
+        specifier: ^3.14.1
+        version: 3.14.1
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -340,27 +349,48 @@ importers:
       '@react-leaflet/core':
         specifier: ^2.1.0
         version: 2.1.0(leaflet@1.9.4)(react-dom@18.3.1)(react@18.3.1)
+      '@reduxjs/toolkit':
+        specifier: ^2.2.6
+        version: 2.2.6(react@18.3.1)
       '@turf/bbox':
         specifier: ^7.0.0
         version: 7.0.0
       '@turf/center':
         specifier: ^7.0.0
         version: 7.0.0
+      '@turf/circle':
+        specifier: ^7.0.0
+        version: 7.0.0
       '@turf/flip':
+        specifier: ^7.0.0
+        version: 7.0.0
+      '@turf/helpers':
         specifier: ^7.0.0
         version: 7.0.0
       '@turf/invariant':
         specifier: ^7.0.0
         version: 7.0.0
+      '@turf/meta':
+        specifier: ^7.0.0
+        version: 7.0.0
+      '@turf/point-on-feature':
+        specifier: ^7.0.0
+        version: 7.0.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
+      geojson-validation:
+        specifier: ^1.0.2
+        version: 1.0.2
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
       leaflet.fullscreen:
         specifier: ^3.0.2
         version: 3.0.2
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       react:
         specifier: '>=18'
         version: 18.3.1
@@ -370,7 +400,19 @@ importers:
       react-leaflet:
         specifier: ^4.2.1
         version: 4.2.1(leaflet@1.9.4)(react-dom@18.3.1)(react@18.3.1)
+      react-leaflet-geoman-v2:
+        specifier: ^1.0.1
+        version: 1.0.1(@geoman-io/leaflet-geoman-free@2.17.0)(react-dom@18.3.1)(react-leaflet@4.2.1)(react@18.3.1)
+      react-use:
+        specifier: ^17.5.0
+        version: 17.5.0(react-dom@18.3.1)(react@18.3.1)
+      zustand:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     devDependencies:
+      '@tsconfig/vite-react':
+        specifier: ^3.0.2
+        version: 3.0.2
       '@types/geojson':
         specifier: ^7946.0.14
         version: 7946.0.14

@@ -1,7 +1,11 @@
 import { createRoot } from 'react-dom/client'
+import Alpine from 'alpinejs'
 import App from './App'
 
 import './main.scss'
+import { cloneDeep, pick } from 'lodash';
+import { MapStoreProvider } from 'react-map';
+
 
 function filamentMapEntry(
   {
@@ -18,11 +22,17 @@ function filamentMapEntry(
       const root = createRoot(mapEl)
 
       const appProps: any = {
-        state: this.state,
+        $wire: this['$wire'],
+        $watch: this['$watch'],
+        state: cloneDeep(Alpine.raw(this.state)),
         config
       }
 
-      root.render(<App {...appProps} />)
+      root.render((
+        <MapStoreProvider value={pick(appProps, ['$wire', 'state', 'config'])}>
+          <App {...appProps} />
+        </MapStoreProvider>
+      ))
     },
   }
 }

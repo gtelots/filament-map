@@ -349,7 +349,8 @@ class Map extends Field
 
     public function getControls(): array
     {
-        return array_merge(config('filament-map.config.controls', []), $this->evaluate($this->controls));
+        $controlCases = config('filament-map.config.controlCases.MapField', []);
+        return array_merge(config('filament-map.config.controls', []), $controlCases, $this->evaluate($this->controls));
     }
 
     /**

@@ -1,27 +1,56 @@
+import { useRef } from "react"
 import { MapContainer, TileLayer } from "react-leaflet"
+import { ControlManager, FeatureManager, setDefaultIcon, useMapStore } from "react-map"
 
-function App(){
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
+
+setDefaultIcon()
+
+export type AppProps = {
+  $wire: any
+  $watch: any
+  state: any
+  config: Record<string, any>
+}
+
+function App(props: AppProps){
+  const { $wire, $watch, state, config } = props
+  const {
+    statePath,
+    defaultCenter,
+    defaultZoom,
+    latitudeField,
+    longitudeField,
+    drawField,
+    baseLayers,
+    geomType,
+    zoomToFeature,
+    ...other
+  } = config
+
+  const mapRef = useRef(null)
+
   const mapOptions = {
-    center: [51.505, -0.09],
-    zoom: 13,
     style: {
-      height: '100%'
+      height: '100%',
     },
     zoomControl: false,
     attributionControl: false,
+    ...other.mapOptions,
+    center: defaultCenter,
+    zoom: defaultZoom,
     whenReady: ({ target: map }) => {
-      setTimeout(() => map.invalidateSize(), 100)
-    }
+      setTimeout(() => {
+        map.invalidateSize()
+      }, 100)
+    },
   } as any
 
   return (
-    <MapContainer {...mapOptions}>
-      <TileLayer
-        // @ts-ignore
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-  </MapContainer>
+    <MapContainer {...mapOptions} ref={mapRef}>
+      <ControlManager />
+      <FeatureManager />
+    </MapContainer>
   )
 }
 
