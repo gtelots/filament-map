@@ -62,8 +62,6 @@ function App(props: AppProps) {
 
   useEffect(() => {
     $watch('state', (value) => {
-      console.log('watchState', value)
-
       if (!value) {
         removeFeatures()
         return

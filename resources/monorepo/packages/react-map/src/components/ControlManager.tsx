@@ -9,7 +9,8 @@ import { GeomanControls } from 'react-leaflet-geoman-v2'
 import { FullscreenControl } from '../controls/FullscreenControl'
 import { useMapStore } from '../hooks/useMapStore'
 import { map as _map } from 'lodash'
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
+import DynamicLayer from './DynamicLayer'
 
 const controlComponents = {
   zoomControl: ZoomControl,
@@ -37,19 +38,18 @@ const defaultDrawControlOptions = {
 }
 
 function ControlManager() {
-  const [geomType, baseLayers, _controls] = useMapStore((state) => [
+  const [geomType, layers, baseLayers, _controls] = useMapStore((state) => [
     state.config.geomType,
+    state.config.layers,
     state.config.baseLayers,
     state.config.controls,
   ])
 
-  const [addFeature, removeFeature, removeFeatures] = useMapStore(
-    (state) => [
-      state.addFeature,
-      state.removeFeature,
-      state.removeFeatures,
-    ],
-  )
+  const [addFeature, removeFeature, removeFeatures] = useMapStore((state) => [
+    state.addFeature,
+    state.removeFeature,
+    state.removeFeatures,
+  ])
 
   const handleCreate = (e) => {
     e.target.removeLayer(e.layer)
@@ -65,7 +65,7 @@ function ControlManager() {
     id && removeFeature(id)
   }
 
-  const controls = _map(_controls, (opts, name) => {
+  const controls = useMemo(() => _map(_controls, (opts, name) => {
     const Component = controlComponents[name]
     if (!opts || opts?.enabled == false || !Component) return null
 
@@ -80,6 +80,14 @@ function ControlManager() {
               <LayersControl.BaseLayer key={k} name={title} checked={selected}>
                 <TileLayer url="" {...layerProps} />
               </LayersControl.BaseLayer>
+            ),
+          )}
+
+          {layers?.map(
+            ({ selected = false, title = 'None', ...layerProps }, k) => (
+              <LayersControl.Overlay key={k} name={title} checked={selected}>
+                <DynamicLayer {...(layerProps as any)} />
+              </LayersControl.Overlay>
             ),
           )}
         </Fragment>
@@ -142,7 +150,7 @@ function ControlManager() {
     }
 
     return <Component key={name} {...options} children={children} />
-  }).filter((v) => v)
+  }).filter((v) => v), [JSON.stringify(_controls)])
 
   return controls.map((control: any) => control)
 }

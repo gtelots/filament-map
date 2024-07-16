@@ -21,6 +21,12 @@ $borderRadius: 8px;
 
 .leaflet-control-layers {
   border-radius: $borderRadius;
+
+  .leaflet-control-layers-overlays > label > span {
+    display: flex;
+    align-self: start;
+    gap: 4px
+  }
 }
 
 .leaflet-pm-toolbar {
@@ -39,4 +45,4 @@ $borderRadius: 8px;
   a[href="https://leafletjs.com"], span[aria-hidden="true"] {
     display: none;
   }
-} 
+}

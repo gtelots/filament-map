@@ -8,8 +8,6 @@ function LayerManager(){
 
   useEffect(() => {
     setTimeout(() => {
-      console.log(123);
-
       setConfig()
     }, 2000)
 

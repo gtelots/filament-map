@@ -337,7 +337,7 @@ class Map extends Field
     {
         $layers = $this->evaluate($this->layers);
 
-        return empty($layers) ? config('filament-map.config.layers', []) : [];
+        return empty($layers) ? config('filament-map.config.layers', []) : $layers;
     }
 
     public function controls(Closure|array $controls): static
