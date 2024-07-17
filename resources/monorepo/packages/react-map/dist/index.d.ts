@@ -12,9 +12,24 @@ interface GeoJSONProps extends GeoJSONOptions, LayerGroupProps, PathProps {
 }
 declare const GeoJSON: react.ForwardRefExoticComponent<GeoJSONProps & react.RefAttributes<GeoJSON$1<any, geojson.Geometry>>>;
 
+type TPopupTemplate = {
+    heading?: '';
+    content?: Record<string, any> | string;
+    data: Record<string, any>;
+    template?: string;
+};
+declare function PopupTemplate(props: TPopupTemplate): react_jsx_runtime.JSX.Element;
+
+type TGeoJSONAjax = {
+    dataUrl: string;
+    pmIgnore?: boolean;
+    children?: any;
+};
+declare function GeoJSONAjax(props: TGeoJSONAjax): react_jsx_runtime.JSX.Element;
+
 declare function FeatureManager(): any;
 
-declare function ControlManager(): any;
+declare function ControlManager(): any[];
 
 declare const featuresSelectors: _reduxjs_toolkit.EntitySelectors<{
     id: _reduxjs_toolkit.EntityId;
@@ -55,4 +70,4 @@ declare function zoomToFeatureByState({ state, config: { zoomToFeature }, map }:
     map: any;
 }): void;
 
-export { ControlManager, FeatureManager, FullscreenControl, GeoJSON, MapStoreProvider, featuresSelectors, setDefaultIcon, setFeaturesByState, toBounds, toLatLng, useMapStore, zoomToFeatureByState };
+export { ControlManager, FeatureManager, FullscreenControl, GeoJSON, GeoJSONAjax, MapStoreProvider, PopupTemplate, featuresSelectors, setDefaultIcon, setFeaturesByState, toBounds, toLatLng, useMapStore, zoomToFeatureByState };

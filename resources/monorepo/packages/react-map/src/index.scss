@@ -46,3 +46,23 @@ $borderRadius: 8px;
     display: none;
   }
 }
+
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+
+
+  .pc-heading {
+    font-weight: 600;
+    color: #3a86ff;
+  }
+
+  .pc-content-label {
+    font-weight: 600;
+  }
+
+
+  hr {
+    margin: 4px;
+  }
+}
