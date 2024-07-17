@@ -1,5 +1,5 @@
 import { createPathComponent, createElementObject, extendContext, createControlComponent } from '@react-leaflet/core';
-import he, { GeoJSON, Control } from 'leaflet';
+import L, { GeoJSON as GeoJSON$1, Control } from 'leaflet';
 import { isArray, get, isFunction, last, map, template, isString } from 'lodash';
 import { jsx, jsxs } from 'react/jsx-runtime';
 import { createContext, useRef, useContext, useState, useEffect, useMemo, Fragment } from 'react';
@@ -14,19 +14,478 @@ import { useUpdateEffect } from 'react-use';
 import { circle } from '@turf/circle';
 import { pointOnFeature } from '@turf/point-on-feature';
 import { isPoint, isGeoJSONObject } from 'geojson-validation';
-import Oe from 'leaflet/dist/images/marker-icon.png';
-import Xe from 'leaflet/dist/images/marker-icon-2x.png';
-import Le from 'leaflet/dist/images/marker-shadow.png';
-import ve from '@turf/center';
-import Be from '@turf/flip';
+import MarkerIcon from 'leaflet/dist/images/marker-icon.png';
+import MarkerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import MarkerShadowIcon from 'leaflet/dist/images/marker-shadow.png';
+import center from '@turf/center';
+import flip from '@turf/flip';
 import { bbox } from '@turf/bbox';
 import { GeomanControls } from 'react-leaflet-geoman-v2';
 import 'leaflet.fullscreen';
 import 'leaflet.fullscreen/Control.FullScreen.css';
 import { renderToString } from 'react-dom/server';
 
-var g=createPathComponent(function({data:r,...e},o){let n=new GeoJSON(r,e);return createElementObject(n,extendContext(o,{overlayContainer:n}))},function(r,e,o){e.data!==o.data&&r.clearLayers().addData(e.data),e.style!==o.style&&(e.style==null?r.resetStyle():r.setStyle(e.style));});var v=(t,r)=>t?template(t,{interpolate:/{{([\s\S]+?)}}/g})(r):"";function ee(t){let{template:r,heading:e,content:o,data:n}=t;return r?jsx("div",{dangerouslySetInnerHTML:{__html:v(r,n)}}):jsxs("div",{children:[jsx("div",{className:"pc-heading",children:v(e,n)}),jsx("hr",{}),isArray(o)?jsx("div",{children:o?.map((p,s)=>jsxs("div",{children:[jsxs("span",{className:"pc-content-label",children:[p.label,": "]}),get(n,p.value)]},s))}):jsx("div",{dangerouslySetInnerHTML:{__html:v(o,n)}})]})}var O=ee;function ae(t){let{dataUrl:r,children:e,...o}=t,[n,p]=useState(null);return useEffect(()=>{r&&fetch(r).then(s=>s.json()).then(s=>{p(s);});},[r]),jsx(g,{...o,data:n,children:isFunction(e)&&n&&e(n)})}var V=ae;var b=createEntityAdapter(),W=b.getSelectors(t=>t),Y=b.getInitialState({$wire:null,$watch:null,state:null,config:{}}),fe=(t,r)=>({addFeature:e=>t(o=>{b.addOne(o,{id:nanoid(),...e});}),updateFeature:e=>t(o=>{b.updateOne(o,e);}),removeFeature:e=>t(o=>{b.removeOne(o,e);}),setFeatures:e=>t(o=>{b.setAll(o,e);}),removeFeatures:()=>t(e=>{b.removeAll(e);})}),A=createContext(null),ye=({children:t,value:r})=>{let e=useRef();return e.current||(e.current=createStore()(immer((o,n)=>({...Y,...r,...fe(o),reset:()=>({...Y,...r})})))),jsx(A.Provider,{value:e.current,children:t})},F=t=>{let r=useContext(A);if(!r)throw new Error("Missing MapStoreProvider");return useStore(r,t)};function Je({state:t,setFeatures:r}){let e=getType(t);if(e==="MultiPoint")r(getCoords(t).map(o=>({id:nanoid(),...point(o)})));else if(e==="MultiLineString")r(getCoords(t).map(o=>({id:nanoid(),...lineString(o)})));else if(e==="MultiPolygon")r(getCoords(t).map(o=>({id:nanoid(),...polygon(o)})));else if(["Point","LineString","Polygon"].includes(e))r([{id:nanoid(),...feature(t)}]);else if(e==="GeometryCollection"){let o=[];flattenEach(t,n=>o.push({id:nanoid(),...n})),r(o);}}var X=Je;function Ie(t={}){he.Icon.Default.mergeOptions({iconUrl:Oe,iconRetinaUrl:Xe,shadowUrl:Le,...t});}var Ze=Ie;function Ve(t){return t&&getCoord(Be(ve(t)))}var L=Ve;function Re(t){let r=bbox(t);return [[r[1],r[0]],[r[3],r[2]]]}var I=Re;function Ae({state:t,config:{zoomToFeature:r},map:e}){let o=getGeom(t);if(isPoint(o)){if(r){let n=I(circle(t,.25,{steps:4}));e.fitBounds(n,{animate:!1});}else e.panTo(L(t),{animate:!1});return}if(isGeoJSONObject(o))if(r){let n=I(t);e.fitBounds(n,{animate:!1});}else e.panTo(L(pointOnFeature(t)));}var N=Ae;function Ke(){let t=useMap(),[r,e,o,n,p,s,d,c,U,i,f]=F(a=>[a.state,a.$wire,a.config.geomType,a.config.latitudeField,a.config.longitudeField,a.config.drawField,a.config.zoomToFeature,W.selectAll(a),a.updateFeature,a.setFeatures,a.removeFeature]);return useEffect(()=>{r&&(X({state:r,setFeatures:i}),N({state:r,config:{zoomToFeature:d},map:t}));},[]),useUpdateEffect(()=>{if(c?.length){if(["Point","LineString","Polygon"].includes(o)&&c?.length===1){let a=getGeom(last(c));if(o==="Point"){let l=getCoord(a);n&&e.set(n,l[1],!1),p&&e.set(p,l[0],!1);}s&&e.set(s,JSON.stringify(a),!1);}else if(o==="MultiPoint"){let a=getGeom(multiPoint(map(c,l=>getCoord(l))));s&&e.set(s,JSON.stringify(a),!1);}else if(o==="MultiLineString"){let a=getGeom(multiLineString(map(c,l=>getCoords(l))));s&&e.set(s,JSON.stringify(a),!1);}else if(o==="MultiPolygon"){let a=getGeom(multiPolygon(map(c,l=>getCoords(l))));s&&e.set(s,JSON.stringify(a),!1);}else if(o==="GeometryCollection"){let a=getGeom(geometryCollection(map(c,l=>getGeom(l))));s&&e.set(s,JSON.stringify(a),!1);}}else s&&e.set(s,"",!1);},[JSON.stringify(c)]),c?.map((a,l)=>jsx(g,{data:a,eventHandlers:{"pm:update":({layer:m,target:y})=>{featureEach(y.toGeoJSON(),(u,C)=>{U({id:u.id,changes:u});});},"pm:cut":m=>{t.removeLayer(m.layer);let y=get(m,"originalLayer.feature.id");f(y);let u=getType(m.layer.toGeoJSON()),C=getGeom(u===o?m.layer.toGeoJSON():m.originalLayer.toGeoJSON());X({state:C,setFeatures:i});}}},l))}var et=Ke;var w=createControlComponent(function(r){return new Control.FullScreen(r)});function nt(t){let{type:r,popupTemplate:e,...o}=t,n=e?isString(e)?{template:e}:e:{};if(r==="wms"){let p={url:"",format:"image/png",transparent:!0,...o};return jsx(WMSTileLayer,{...p})}if(r==="geojson"){if(o.data){let p={data:isString(o.data)?JSON.parse(o.data):o.data,pmIgnore:!0,onEachFeature:(s,d)=>{e&&d.bindPopup(()=>renderToString(jsx(O,{data:s?.properties,...n})));}};return jsx(g,{...p})}if(o.dataUrl){let p={dataUrl:o.dataUrl,pmIgnore:!0,onEachFeature:(s,d)=>{e&&d.bindPopup(()=>renderToString(jsx(O,{data:s?.properties,...n})));}};return jsx(V,{...p})}}return null}var j=nt;var ft={zoomControl:ZoomControl,layersControl:LayersControl,drawControl:GeomanControls,attributionControl:AttributionControl,scaleControl:ScaleControl,fullscreenControl:w},yt={drawMarker:!0,drawCircle:!1,drawCircleMarker:!1,drawPolyline:!1,drawRectangle:!1,drawPolygon:!1,drawText:!1,editMode:!0,dragMode:!1,cutPolygon:!1,removalMode:!0,rotateMode:!1};function gt(){let[t,r,e,o]=F(i=>[i.config.geomType,i.config.layers,i.config.baseLayers,i.config.controls]),[n,p,s]=F(i=>[i.addFeature,i.removeFeature,i.removeFeatures]),d=i=>{i.target.removeLayer(i.layer),["Point","LineString","Polygon"].includes(t)&&s(),n(i.layer.toGeoJSON());},c=({layer:i,target:f})=>{let a=i.feature.id;a&&p(a);};return useMemo(()=>map(o,(i,f)=>{let a=ft[f];if(!i||i?.enabled==!1||!a)return null;let l={...i},m=null;return f==="layersControl"&&(m=jsxs(Fragment,{children:[e?.map(({selected:y=!1,title:u="None",...C},M)=>jsx(LayersControl.BaseLayer,{name:u,checked:y,children:jsx(TileLayer,{url:"",...C})},M)),r?.map(({selected:y=!1,title:u="None",...C},M)=>jsx(LayersControl.Overlay,{name:u,checked:y,children:jsx(j,{...C})},M))]})),f==="drawControl"&&(l={...l,options:yt},["Point","MultiPoint"].includes(t)?l.options={...l.options,drawMarker:!0,editMode:!0,removalMode:!0}:["LineString","MultiLineString"].includes(t)?l.options={...l.options,drawPolyline:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0}:["Polygon","MultiPolygon"].includes(t)?l.options={...l.options,drawRectangle:!0,drawPolygon:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0}:l.options={...l.options,drawMarker:!0,drawCircle:!0,drawPolyline:!0,drawRectangle:!0,drawPolygon:!0,editMode:!0,dragMode:!0,cutPolygon:!0,removalMode:!0,rotateMode:!0},l.onCreate=d,l.onMapRemove=c),jsx(a,{...l,children:m},f)}).filter(i=>i),[JSON.stringify(o)]).map(i=>i)}var bt=gt;
+// src/components/GeoJSON.tsx
+var GeoJSON = createPathComponent(
+  function createGeoJSON({ data, ...options }, ctx) {
+    const geoJSON = new GeoJSON$1(data, options);
+    return createElementObject(
+      geoJSON,
+      extendContext(ctx, { overlayContainer: geoJSON })
+    );
+  },
+  function updateGeoJSON(layer, props, prevProps) {
+    if (props.data !== prevProps.data) {
+      layer.clearLayers().addData(props.data);
+    }
+    if (props.style !== prevProps.style) {
+      if (props.style == null) {
+        layer.resetStyle();
+      } else {
+        layer.setStyle(props.style);
+      }
+    }
+  }
+);
+var tpl = (str, data) => str ? template(str, { interpolate: /{{([\s\S]+?)}}/g })(data) : "";
+function PopupTemplate(props) {
+  const { template: template2, heading, content, data } = props;
+  if (template2) return /* @__PURE__ */ jsx("div", { dangerouslySetInnerHTML: { __html: tpl(template2, data) } });
+  return /* @__PURE__ */ jsxs("div", { children: [
+    /* @__PURE__ */ jsx("div", { className: "pc-heading", children: tpl(heading, data) }),
+    /* @__PURE__ */ jsx("hr", {}),
+    isArray(content) ? /* @__PURE__ */ jsx("div", { children: content?.map((c, k) => /* @__PURE__ */ jsxs("div", { children: [
+      /* @__PURE__ */ jsxs("span", { className: "pc-content-label", children: [
+        c.label,
+        ": "
+      ] }),
+      get(data, c.value)
+    ] }, k)) }) : /* @__PURE__ */ jsx("div", { dangerouslySetInnerHTML: { __html: tpl(content, data) } })
+  ] });
+}
+var PopupTemplate_default = PopupTemplate;
+function GeoJSONAjax(props) {
+  const { dataUrl, children, ...opts } = props;
+  const [enabled, setEnabled] = useState(false);
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (enabled && dataUrl) {
+      fetch(dataUrl).then((resp) => resp.json()).then((resp) => {
+        setData(resp);
+      });
+    }
+  }, [enabled, dataUrl]);
+  return /* @__PURE__ */ jsx(GeoJSON, { ...opts, data, eventHandlers: {
+    "add": (event) => {
+      setEnabled(true);
+    },
+    "remove": (event) => {
+      setEnabled(false);
+    }
+  }, children: isFunction(children) && data && children(data) });
+}
+var GeoJSONAjax_default = GeoJSONAjax;
+var featuresAdapter = createEntityAdapter();
+var featuresSelectors = featuresAdapter.getSelectors((state) => state);
+var initialState = featuresAdapter.getInitialState({
+  $wire: null,
+  $watch: null,
+  state: null,
+  config: {}
+});
+var actions = (set, get3) => ({
+  addFeature: (feature2) => set((state) => {
+    featuresAdapter.addOne(state, { id: nanoid(), ...feature2 });
+  }),
+  updateFeature: (payload) => set((state) => {
+    featuresAdapter.updateOne(state, payload);
+  }),
+  removeFeature: (id) => set((state) => {
+    featuresAdapter.removeOne(state, id);
+  }),
+  setFeatures: (features) => set((state) => {
+    featuresAdapter.setAll(state, features);
+  }),
+  removeFeatures: () => set((state) => {
+    featuresAdapter.removeAll(state);
+  })
+});
+var MapStoreContext = createContext(null);
+var MapStoreProvider = ({ children, value }) => {
+  const storeRef = useRef();
+  if (!storeRef.current) {
+    storeRef.current = createStore()(immer((set, get3) => ({
+      ...initialState,
+      ...value,
+      ...actions(set),
+      reset: () => ({
+        ...initialState,
+        ...value
+      })
+    })));
+  }
+  return /* @__PURE__ */ jsx(MapStoreContext.Provider, { value: storeRef.current, children });
+};
+var useMapStore = (selector) => {
+  const store = useContext(MapStoreContext);
+  if (!store) {
+    throw new Error("Missing MapStoreProvider");
+  }
+  return useStore(store, selector);
+};
+function setFeaturesByState({ state, setFeatures }) {
+  const type = getType(state);
+  if (type === "MultiPoint") {
+    setFeatures(
+      getCoords(state).map((coord) => ({
+        id: nanoid(),
+        ...point(coord)
+      }))
+    );
+  } else if (type === "MultiLineString") {
+    setFeatures(
+      getCoords(state).map((coord) => ({
+        id: nanoid(),
+        ...lineString(coord)
+      }))
+    );
+  } else if (type === "MultiPolygon") {
+    setFeatures(
+      getCoords(state).map((coord) => ({
+        id: nanoid(),
+        ...polygon(coord)
+      }))
+    );
+  } else if (["Point", "LineString", "Polygon"].includes(type)) {
+    setFeatures([
+      {
+        id: nanoid(),
+        ...feature(state)
+      }
+    ]);
+  } else if (type === "GeometryCollection") {
+    let newFeatures = [];
+    flattenEach(state, (currentFeature) => newFeatures.push({ id: nanoid(), ...currentFeature }));
+    setFeatures(newFeatures);
+  }
+}
+var setFeaturesByState_default = setFeaturesByState;
+function setDefaultIcon(options = {}) {
+  L.Icon.Default.mergeOptions({
+    iconUrl: MarkerIcon,
+    iconRetinaUrl: MarkerIcon2x,
+    shadowUrl: MarkerShadowIcon,
+    ...options
+  });
+}
+var setDefaultIcon_default = setDefaultIcon;
+function toLatLng(data) {
+  if (!data) return data;
+  return getCoord(flip(center(data)));
+}
+var toLatLng_default = toLatLng;
+function toBounds(data) {
+  const arr = bbox(data);
+  return [
+    [arr[1], arr[0]],
+    [arr[3], arr[2]]
+  ];
+}
+var toBounds_default = toBounds;
 
-export { bt as ControlManager, et as FeatureManager, w as FullscreenControl, g as GeoJSON, V as GeoJSONAjax, ye as MapStoreProvider, O as PopupTemplate, W as featuresSelectors, Ze as setDefaultIcon, X as setFeaturesByState, I as toBounds, L as toLatLng, F as useMapStore, N as zoomToFeatureByState };
+// src/utils/zoomToFeatureByState.ts
+function zoomToFeatureByState({
+  state,
+  config: { zoomToFeature },
+  map
+}) {
+  const geometry = getGeom(state);
+  if (isPoint(geometry)) {
+    if (zoomToFeature) {
+      const bounds = toBounds_default(circle(state, 0.25, { steps: 4 }));
+      map.fitBounds(bounds, { animate: false });
+    } else {
+      map.panTo(toLatLng_default(state), { animate: false });
+    }
+    return;
+  }
+  if (isGeoJSONObject(geometry)) {
+    if (zoomToFeature) {
+      const bounds = toBounds_default(state);
+      map.fitBounds(bounds, { animate: false });
+    } else {
+      map.panTo(toLatLng_default(pointOnFeature(state)));
+    }
+  }
+}
+var zoomToFeatureByState_default = zoomToFeatureByState;
+function FeatureManager() {
+  const map$1 = useMap();
+  const [
+    state,
+    $wire,
+    geomType,
+    latitudeField,
+    longitudeField,
+    drawField,
+    zoomToFeature,
+    features,
+    updateFeature,
+    setFeatures,
+    removeFeature
+  ] = useMapStore((state2) => [
+    state2.state,
+    state2.$wire,
+    state2.config.geomType,
+    state2.config.latitudeField,
+    state2.config.longitudeField,
+    state2.config.drawField,
+    state2.config.zoomToFeature,
+    featuresSelectors.selectAll(state2),
+    state2.updateFeature,
+    state2.setFeatures,
+    state2.removeFeature
+  ]);
+  useEffect(() => {
+    if (!state) return;
+    setFeaturesByState_default({
+      state,
+      setFeatures
+    });
+    zoomToFeatureByState_default({
+      state,
+      config: { zoomToFeature },
+      map: map$1
+    });
+  }, []);
+  useUpdateEffect(() => {
+    if (features?.length) {
+      if (["Point", "LineString", "Polygon"].includes(geomType) && features?.length === 1) {
+        const geometry = getGeom(last(features));
+        if (geomType === "Point") {
+          const coords = getCoord(geometry);
+          latitudeField && $wire.set(latitudeField, coords[1], false);
+          longitudeField && $wire.set(longitudeField, coords[0], false);
+        }
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false);
+      } else if (geomType === "MultiPoint") {
+        const geometry = getGeom(multiPoint(map(features, (i) => getCoord(i))));
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false);
+      } else if (geomType === "MultiLineString") {
+        const geometry = getGeom(
+          multiLineString(map(features, (i) => getCoords(i)))
+        );
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false);
+      } else if (geomType === "MultiPolygon") {
+        const geometry = getGeom(
+          multiPolygon(map(features, (i) => getCoords(i)))
+        );
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false);
+      } else if (geomType === "GeometryCollection") {
+        const geometry = getGeom(
+          geometryCollection(map(features, (i) => getGeom(i)))
+        );
+        drawField && $wire.set(drawField, JSON.stringify(geometry), false);
+      }
+    } else {
+      drawField && $wire.set(drawField, "", false);
+    }
+  }, [JSON.stringify(features)]);
+  return features?.map((f, k) => /* @__PURE__ */ jsx(
+    GeoJSON,
+    {
+      data: f,
+      eventHandlers: {
+        "pm:update": ({ layer, target }) => {
+          featureEach(target.toGeoJSON(), (feature2, index) => {
+            updateFeature({
+              id: feature2.id,
+              changes: feature2
+            });
+          });
+        },
+        "pm:cut": (e) => {
+          map$1.removeLayer(e.layer);
+          const id = get(e, "originalLayer.feature.id");
+          removeFeature(id);
+          const type = getType(e.layer.toGeoJSON());
+          const geometry = getGeom(
+            type === geomType ? e.layer.toGeoJSON() : e.originalLayer.toGeoJSON()
+          );
+          setFeaturesByState_default({
+            state: geometry,
+            setFeatures
+          });
+        }
+      }
+    },
+    k
+  ));
+}
+var FeatureManager_default = FeatureManager;
+var FullscreenControl = createControlComponent(function createFullscreenControl(props) {
+  return new Control.FullScreen(props);
+});
+function DynamicLayer(props) {
+  const { type, popupTemplate, ...other } = props;
+  let tplPopupProps = popupTemplate ? isString(popupTemplate) ? { template: popupTemplate } : popupTemplate : {};
+  if (type === "wms") {
+    const opts = {
+      url: "",
+      format: "image/png",
+      transparent: true,
+      ...other
+    };
+    return /* @__PURE__ */ jsx(WMSTileLayer, { ...opts });
+  }
+  if (type === "geojson") {
+    if (other.data) {
+      const opts = {
+        data: isString(other.data) ? JSON.parse(other.data) : other.data,
+        pmIgnore: true,
+        onEachFeature: (feature2, layer) => {
+          popupTemplate && layer.bindPopup(() => {
+            return renderToString(
+              /* @__PURE__ */ jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
+            );
+          });
+        }
+      };
+      return /* @__PURE__ */ jsx(GeoJSON, { ...opts });
+    }
+    if (other.dataUrl) {
+      const opts = {
+        dataUrl: other.dataUrl,
+        pmIgnore: true,
+        onEachFeature: (feature2, layer) => {
+          popupTemplate && layer.bindPopup(() => {
+            return renderToString(
+              /* @__PURE__ */ jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
+            );
+          });
+        }
+      };
+      return /* @__PURE__ */ jsx(GeoJSONAjax_default, { ...opts });
+    }
+  }
+  return null;
+}
+var DynamicLayer_default = DynamicLayer;
+var controlComponents = {
+  zoomControl: ZoomControl,
+  layersControl: LayersControl,
+  drawControl: GeomanControls,
+  attributionControl: AttributionControl,
+  scaleControl: ScaleControl,
+  fullscreenControl: FullscreenControl
+};
+var defaultDrawControlOptions = {
+  drawMarker: true,
+  drawCircle: false,
+  drawCircleMarker: false,
+  drawPolyline: false,
+  drawRectangle: false,
+  drawPolygon: false,
+  drawText: false,
+  editMode: true,
+  dragMode: false,
+  cutPolygon: false,
+  removalMode: true,
+  rotateMode: false
+};
+function ControlManager() {
+  const [geomType, layers, baseLayers, _controls] = useMapStore((state) => [
+    state.config.geomType,
+    state.config.layers,
+    state.config.baseLayers,
+    state.config.controls
+  ]);
+  const [addFeature, removeFeature, removeFeatures] = useMapStore((state) => [
+    state.addFeature,
+    state.removeFeature,
+    state.removeFeatures
+  ]);
+  const handleCreate = (e) => {
+    e.target.removeLayer(e.layer);
+    if (["Point", "LineString", "Polygon"].includes(geomType)) removeFeatures();
+    addFeature(e.layer.toGeoJSON());
+  };
+  const handleRemove = ({ layer, target }) => {
+    const id = layer.feature.id;
+    id && removeFeature(id);
+  };
+  const controls = useMemo(() => map(_controls, (opts, name) => {
+    const Component = controlComponents[name];
+    if (!opts || opts?.enabled == false || !Component) return null;
+    let options = { ...opts };
+    let children = null;
+    if (name === "layersControl") {
+      children = /* @__PURE__ */ jsxs(Fragment, { children: [
+        baseLayers?.map(
+          ({ selected = false, title = "None", ...layerProps }, k) => /* @__PURE__ */ jsx(LayersControl.BaseLayer, { name: title, checked: selected, children: /* @__PURE__ */ jsx(TileLayer, { url: "", ...layerProps }) }, k)
+        ),
+        layers?.map(
+          ({ selected = false, title = "None", ...layerProps }, k) => /* @__PURE__ */ jsx(LayersControl.Overlay, { name: title, checked: selected, children: /* @__PURE__ */ jsx(DynamicLayer_default, { ...layerProps }) }, k)
+        )
+      ] });
+    }
+    if (name === "drawControl") {
+      options = {
+        ...options,
+        options: defaultDrawControlOptions
+      };
+      if (["Point", "MultiPoint"].includes(geomType)) {
+        options.options = {
+          ...options.options,
+          drawMarker: true,
+          editMode: true,
+          removalMode: true
+        };
+      } else if (["LineString", "MultiLineString"].includes(geomType)) {
+        options.options = {
+          ...options.options,
+          drawPolyline: true,
+          editMode: true,
+          dragMode: true,
+          cutPolygon: true,
+          removalMode: true,
+          rotateMode: true
+        };
+      } else if (["Polygon", "MultiPolygon"].includes(geomType)) {
+        options.options = {
+          ...options.options,
+          drawRectangle: true,
+          drawPolygon: true,
+          editMode: true,
+          dragMode: true,
+          cutPolygon: true,
+          removalMode: true,
+          rotateMode: true
+        };
+      } else {
+        options.options = {
+          ...options.options,
+          drawMarker: true,
+          drawCircle: true,
+          drawPolyline: true,
+          drawRectangle: true,
+          drawPolygon: true,
+          editMode: true,
+          dragMode: true,
+          cutPolygon: true,
+          removalMode: true,
+          rotateMode: true
+        };
+      }
+      options.onCreate = handleCreate;
+      options.onMapRemove = handleRemove;
+    }
+    return /* @__PURE__ */ jsx(Component, { ...options, children }, name);
+  }).filter((v) => v), [JSON.stringify(_controls)]);
+  return controls.map((control) => control);
+}
+var ControlManager_default = ControlManager;
+
+export { ControlManager_default as ControlManager, FeatureManager_default as FeatureManager, FullscreenControl, GeoJSON, GeoJSONAjax_default as GeoJSONAjax, MapStoreProvider, PopupTemplate_default as PopupTemplate, featuresSelectors, setDefaultIcon_default as setDefaultIcon, setFeaturesByState_default as setFeaturesByState, toBounds_default as toBounds, toLatLng_default as toLatLng, useMapStore, zoomToFeatureByState_default as zoomToFeatureByState };
 //# sourceMappingURL=out.js.map
 //# sourceMappingURL=index.js.map
