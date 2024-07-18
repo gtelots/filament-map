@@ -29,6 +29,7 @@ function FeatureManager() {
     markerOptions,
     polylineOptions,
     polygonOptions,
+    rectangleOptions,
     features,
     updateFeature,
     setFeatures,
@@ -44,6 +45,7 @@ function FeatureManager() {
     state.config.markerOptions,
     state.config.polylineOptions,
     state.config.polygonOptions,
+    state.config.rectangleOptions,
     featuresSelectors.selectAll(state),
     state.updateFeature,
     state.setFeatures,
@@ -114,7 +116,7 @@ function FeatureManager() {
         return L.marker(latlng, markerOpts);
       }}
       style={() => {
-        return {...polylineOptions, ...polygonOptions}
+        return {...polylineOptions, ...polygonOptions, ...rectangleOptions}
       }}
       eventHandlers={
         {

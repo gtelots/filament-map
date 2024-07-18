@@ -245,7 +245,7 @@ class Map extends Field
 
     public function getMarkerOptions(): ?array
     {
-        return $this->evaluate($this->markerOptions);
+        return empty($this->markerOptions) ? config('filament-map.config.markerOptions', []) :$this->evaluate($this->markerOptions);
     }
 
     public function circleOptions(Closure|array $circleOptions): static
@@ -257,7 +257,7 @@ class Map extends Field
 
     public function getCircleOptions(): ?array
     {
-        return $this->evaluate($this->circleOptions);
+        return empty($this->circleOptions) ? config('filament-map.config.circleOptions', []) :$this->evaluate($this->circleOptions);
     }
 
     public function polylineOptions(Closure|array $polylineOptions): static
@@ -270,7 +270,7 @@ class Map extends Field
 
     public function getPolylineOptions(): ?array
     {
-        return $this->evaluate($this->polylineOptions);
+        return empty($this->polylineOptions) ? config('filament-map.config.polylineOptions', []) :$this->evaluate($this->polylineOptions);
     }
 
     public function polygonOptions(Closure|array $polygonOptions): static
@@ -282,7 +282,7 @@ class Map extends Field
 
     public function getPolygonOptions(): ?array
     {
-        return $this->evaluate($this->polygonOptions);
+        return empty($this->polygonOptions) ? config('filament-map.config.polygonOptions', []) :$this->evaluate($this->polygonOptions);
     }
 
     public function rectangleOptions(Closure|array $rectangleOptions): static
@@ -294,7 +294,7 @@ class Map extends Field
 
     public function getRectangeOptions(): ?array
     {
-        return $this->evaluate($this->rectangleOptions);
+        return empty($this->rectangleOptions) ? config('filament-map.config.rectangleOptions', []) :$this->evaluate($this->rectangleOptions);
     }
 
     public function getState(): mixed

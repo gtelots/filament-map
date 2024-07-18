@@ -251,6 +251,7 @@ function FeatureManager() {
     markerOptions,
     polylineOptions,
     polygonOptions,
+    rectangleOptions,
     features,
     updateFeature,
     setFeatures,
@@ -266,6 +267,7 @@ function FeatureManager() {
     state2.config.markerOptions,
     state2.config.polylineOptions,
     state2.config.polygonOptions,
+    state2.config.rectangleOptions,
     featuresSelectors.selectAll(state2),
     state2.updateFeature,
     state2.setFeatures,
@@ -326,7 +328,7 @@ function FeatureManager() {
         return L2__default.default.marker(latlng, markerOpts);
       },
       style: () => {
-        return { ...polylineOptions, ...polygonOptions };
+        return { ...polylineOptions, ...polygonOptions, ...rectangleOptions };
       },
       eventHandlers: {
         "pm:update": ({ layer, target }) => {
@@ -382,7 +384,8 @@ function DynamicLayer(props) {
       style: (feature2) => {
         return {
           ...other.polylineOptions,
-          ...other.polygonOptions
+          ...other.polygonOptions,
+          ...other.rectangleOptions
         };
       },
       onEachFeature: (feature2, layer) => {

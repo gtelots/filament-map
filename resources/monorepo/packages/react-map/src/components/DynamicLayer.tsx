@@ -16,6 +16,7 @@ type TDynamicLayerProps = {
   markerOptions?: Record<string, any>
   polylineOptions?: Record<string, any>
   polygonOptions?: Record<string, any>
+  rectangleOptions?: Record<string, any>
 }
 
 function DynamicLayer(props: TDynamicLayerProps) {
@@ -50,6 +51,7 @@ function DynamicLayer(props: TDynamicLayerProps) {
         return {
           ...other.polylineOptions,
           ...other.polygonOptions,
+          ...other.rectangleOptions,
         }
       },
       onEachFeature: (feature, layer) => {

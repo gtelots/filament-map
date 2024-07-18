@@ -19,9 +19,7 @@ return [
                 'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
             ],
         ],
-        'layers' => [
-
-        ],
+        'layers' => [],
         'controls' => [
             'layersControl' => [
                 'position' => 'topright',
@@ -55,6 +53,13 @@ return [
             ],
             'MapEntry' => [],
             'MapWidget' => []
+        ],
+        'markerOptions' => [
+            'icon' => [
+                'iconUrl' => 'https://cdn-icons-png.flaticon.com/512/3944/3944427.png',
+                'iconSize' => [40, 40],
+                'iconAnchor' => [20, 40],
+            ]
         ]
     ]
 ];
