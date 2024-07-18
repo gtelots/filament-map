@@ -267,7 +267,6 @@ class Map extends Field
         return $this;
     }
 
-
     public function getPolylineOptions(): ?array
     {
         return empty($this->polylineOptions) ? config('filament-map.config.polylineOptions', []) :$this->evaluate($this->polylineOptions);
