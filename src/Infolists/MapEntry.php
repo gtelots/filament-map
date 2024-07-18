@@ -68,7 +68,7 @@ class MapEntry extends Entry
     {
         $baseLayers = $this->evaluate($this->baseLayers);
 
-        return empty($baseLayers) ? config('filament-map.config.baseLayers', []) : [];
+        return empty($baseLayers) ? config('filament-map.config.baseLayers', []) : $baseLayers;
     }
 
     public function layers(Closure|array $layers): static
