@@ -190,6 +190,11 @@ class MapEntry extends Entry
     {
         $config = array_merge($this->mapConfig, [
             'statePath' => $this->getStatePath(),
+            'markerOptions' => $this->getMarkerOptions(),
+            'circleOptions' => $this->getCircleOptions(),
+            'polylineOptions' => $this->getPolylineOptions(),
+            'polygonOptions' => $this->getPolygonOptions(),
+            'rectangleOptions' => $this->getRectangeOptions(),
             'baseLayers' => $this->getBaseLayers(),
             'layers' => $this->getLayers(),
             'controls' => $this->getControls(),
