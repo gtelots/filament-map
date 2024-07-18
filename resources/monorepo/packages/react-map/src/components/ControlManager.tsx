@@ -22,7 +22,7 @@ const controlComponents = {
 }
 
 const defaultDrawControlOptions = {
-  drawMarker: true,
+  drawMarker: false,
   drawCircle: false,
   drawCircleMarker: false,
   drawPolyline: false,
@@ -73,6 +73,7 @@ function ControlManager() {
     let children: any = null
 
     if (name === 'layersControl') {
+
       children = (
         <Fragment>
           {baseLayers?.map(

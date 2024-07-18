@@ -19,7 +19,9 @@ return [
                 'attribution' => '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
             ],
         ],
-        'layers' => [],
+        'layers' => [
+
+        ],
         'controls' => [
             'layersControl' => [
                 'position' => 'topright',

@@ -14,6 +14,7 @@ import { useUpdateEffect } from 'react-use'
 import setFeaturesByState from '../utils/setFeaturesByState'
 import zoomToFeatureByState from '../utils/zoomToFeatureByState'
 import { GeoJSON } from '../components/GeoJSON'
+import L from 'leaflet'
 
 function FeatureManager() {
   const map = useMap()
@@ -25,6 +26,9 @@ function FeatureManager() {
     longitudeField,
     drawField,
     zoomToFeature,
+    markerOptions,
+    polylineOptions,
+    polygonOptions,
     features,
     updateFeature,
     setFeatures,
@@ -37,6 +41,9 @@ function FeatureManager() {
     state.config.longitudeField,
     state.config.drawField,
     state.config.zoomToFeature,
+    state.config.markerOptions,
+    state.config.polylineOptions,
+    state.config.polygonOptions,
     featuresSelectors.selectAll(state),
     state.updateFeature,
     state.setFeatures,
@@ -101,6 +108,14 @@ function FeatureManager() {
     <GeoJSON
       key={k}
       data={f}
+      pointToLayer={(point, latlng) => {
+        let markerOpts = {...markerOptions}
+        if(markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
+        return L.marker(latlng, markerOpts);
+      }}
+      style={() => {
+        return {...polylineOptions, ...polygonOptions}
+      }}
       eventHandlers={
         {
           'pm:update': ({ layer, target }) => {

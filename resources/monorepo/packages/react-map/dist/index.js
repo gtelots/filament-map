@@ -1,5 +1,5 @@
 import { createPathComponent, createElementObject, extendContext, createControlComponent } from '@react-leaflet/core';
-import L, { GeoJSON as GeoJSON$1, Control } from 'leaflet';
+import L2, { GeoJSON as GeoJSON$1, Control } from 'leaflet';
 import { isArray, get, isFunction, last, map, template, isString } from 'lodash';
 import { jsx, jsxs } from 'react/jsx-runtime';
 import { createContext, useRef, useContext, useState, useEffect, useMemo, Fragment } from 'react';
@@ -75,14 +75,22 @@ function GeoJSONAjax(props) {
       });
     }
   }, [enabled, dataUrl]);
-  return /* @__PURE__ */ jsx(GeoJSON, { ...opts, data, eventHandlers: {
-    "add": (event) => {
-      setEnabled(true);
-    },
-    "remove": (event) => {
-      setEnabled(false);
+  return /* @__PURE__ */ jsx(
+    GeoJSON,
+    {
+      ...opts,
+      data,
+      eventHandlers: {
+        add: (event) => {
+          setEnabled(true);
+        },
+        remove: (event) => {
+          setEnabled(false);
+        }
+      },
+      children: isFunction(children) && data && children(data)
     }
-  }, children: isFunction(children) && data && children(data) });
+  );
 }
 var GeoJSONAjax_default = GeoJSONAjax;
 var featuresAdapter = createEntityAdapter();
@@ -171,7 +179,7 @@ function setFeaturesByState({ state, setFeatures }) {
 }
 var setFeaturesByState_default = setFeaturesByState;
 function setDefaultIcon(options = {}) {
-  L.Icon.Default.mergeOptions({
+  L2.Icon.Default.mergeOptions({
     iconUrl: MarkerIcon,
     iconRetinaUrl: MarkerIcon2x,
     shadowUrl: MarkerShadowIcon,
@@ -229,6 +237,9 @@ function FeatureManager() {
     longitudeField,
     drawField,
     zoomToFeature,
+    markerOptions,
+    polylineOptions,
+    polygonOptions,
     features,
     updateFeature,
     setFeatures,
@@ -241,6 +252,9 @@ function FeatureManager() {
     state2.config.longitudeField,
     state2.config.drawField,
     state2.config.zoomToFeature,
+    state2.config.markerOptions,
+    state2.config.polylineOptions,
+    state2.config.polygonOptions,
     featuresSelectors.selectAll(state2),
     state2.updateFeature,
     state2.setFeatures,
@@ -295,6 +309,14 @@ function FeatureManager() {
     GeoJSON,
     {
       data: f,
+      pointToLayer: (point2, latlng) => {
+        let markerOpts = { ...markerOptions };
+        if (markerOpts.icon) markerOpts.icon = L2.icon(markerOpts.icon);
+        return L2.marker(latlng, markerOpts);
+      },
+      style: () => {
+        return { ...polylineOptions, ...polygonOptions };
+      },
       eventHandlers: {
         "pm:update": ({ layer, target }) => {
           featureEach(target.toGeoJSON(), (feature2, index) => {
@@ -339,31 +361,38 @@ function DynamicLayer(props) {
     return /* @__PURE__ */ jsx(WMSTileLayer, { ...opts });
   }
   if (type === "geojson") {
+    let opts = {
+      // pmIgnore: true,
+      pointToLayer: (point2, latlng) => {
+        let markerOpts = { ...other.markerOptions };
+        if (markerOpts.icon) markerOpts.icon = L2.icon(markerOpts.icon);
+        return L2.marker(latlng, markerOpts);
+      },
+      style: (feature2) => {
+        return {
+          ...other.polylineOptions,
+          ...other.polygonOptions
+        };
+      },
+      onEachFeature: (feature2, layer) => {
+        popupTemplate && layer.bindPopup(() => {
+          return renderToString(
+            /* @__PURE__ */ jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
+          );
+        });
+      }
+    };
     if (other.data) {
-      const opts = {
-        data: isString(other.data) ? JSON.parse(other.data) : other.data,
-        pmIgnore: true,
-        onEachFeature: (feature2, layer) => {
-          popupTemplate && layer.bindPopup(() => {
-            return renderToString(
-              /* @__PURE__ */ jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
-            );
-          });
-        }
+      opts = {
+        ...opts,
+        data: isString(other.data) ? JSON.parse(other.data) : other.data
       };
       return /* @__PURE__ */ jsx(GeoJSON, { ...opts });
     }
     if (other.dataUrl) {
-      const opts = {
-        dataUrl: other.dataUrl,
-        pmIgnore: true,
-        onEachFeature: (feature2, layer) => {
-          popupTemplate && layer.bindPopup(() => {
-            return renderToString(
-              /* @__PURE__ */ jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
-            );
-          });
-        }
+      opts = {
+        ...opts,
+        dataUrl: other.dataUrl
       };
       return /* @__PURE__ */ jsx(GeoJSONAjax_default, { ...opts });
     }
@@ -380,7 +409,7 @@ var controlComponents = {
   fullscreenControl: FullscreenControl
 };
 var defaultDrawControlOptions = {
-  drawMarker: true,
+  drawMarker: false,
   drawCircle: false,
   drawCircleMarker: false,
   drawPolyline: false,

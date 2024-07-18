@@ -1,7 +1,7 @@
 'use strict';
 
 var core = require('@react-leaflet/core');
-var L = require('leaflet');
+var L2 = require('leaflet');
 var lodash = require('lodash');
 var jsxRuntime = require('react/jsx-runtime');
 var react = require('react');
@@ -29,7 +29,7 @@ var server = require('react-dom/server');
 
 function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
-var L__default = /*#__PURE__*/_interopDefault(L);
+var L2__default = /*#__PURE__*/_interopDefault(L2);
 var MarkerIcon__default = /*#__PURE__*/_interopDefault(MarkerIcon);
 var MarkerIcon2x__default = /*#__PURE__*/_interopDefault(MarkerIcon2x);
 var MarkerShadowIcon__default = /*#__PURE__*/_interopDefault(MarkerShadowIcon);
@@ -39,7 +39,7 @@ var flip__default = /*#__PURE__*/_interopDefault(flip);
 // src/components/GeoJSON.tsx
 var GeoJSON = core.createPathComponent(
   function createGeoJSON({ data, ...options }, ctx) {
-    const geoJSON = new L.GeoJSON(data, options);
+    const geoJSON = new L2.GeoJSON(data, options);
     return core.createElementObject(
       geoJSON,
       core.extendContext(ctx, { overlayContainer: geoJSON })
@@ -86,14 +86,22 @@ function GeoJSONAjax(props) {
       });
     }
   }, [enabled, dataUrl]);
-  return /* @__PURE__ */ jsxRuntime.jsx(GeoJSON, { ...opts, data, eventHandlers: {
-    "add": (event) => {
-      setEnabled(true);
-    },
-    "remove": (event) => {
-      setEnabled(false);
+  return /* @__PURE__ */ jsxRuntime.jsx(
+    GeoJSON,
+    {
+      ...opts,
+      data,
+      eventHandlers: {
+        add: (event) => {
+          setEnabled(true);
+        },
+        remove: (event) => {
+          setEnabled(false);
+        }
+      },
+      children: lodash.isFunction(children) && data && children(data)
     }
-  }, children: lodash.isFunction(children) && data && children(data) });
+  );
 }
 var GeoJSONAjax_default = GeoJSONAjax;
 var featuresAdapter = toolkit.createEntityAdapter();
@@ -182,7 +190,7 @@ function setFeaturesByState({ state, setFeatures }) {
 }
 var setFeaturesByState_default = setFeaturesByState;
 function setDefaultIcon(options = {}) {
-  L__default.default.Icon.Default.mergeOptions({
+  L2__default.default.Icon.Default.mergeOptions({
     iconUrl: MarkerIcon__default.default,
     iconRetinaUrl: MarkerIcon2x__default.default,
     shadowUrl: MarkerShadowIcon__default.default,
@@ -240,6 +248,9 @@ function FeatureManager() {
     longitudeField,
     drawField,
     zoomToFeature,
+    markerOptions,
+    polylineOptions,
+    polygonOptions,
     features,
     updateFeature,
     setFeatures,
@@ -252,6 +263,9 @@ function FeatureManager() {
     state2.config.longitudeField,
     state2.config.drawField,
     state2.config.zoomToFeature,
+    state2.config.markerOptions,
+    state2.config.polylineOptions,
+    state2.config.polygonOptions,
     featuresSelectors.selectAll(state2),
     state2.updateFeature,
     state2.setFeatures,
@@ -306,6 +320,14 @@ function FeatureManager() {
     GeoJSON,
     {
       data: f,
+      pointToLayer: (point2, latlng) => {
+        let markerOpts = { ...markerOptions };
+        if (markerOpts.icon) markerOpts.icon = L2__default.default.icon(markerOpts.icon);
+        return L2__default.default.marker(latlng, markerOpts);
+      },
+      style: () => {
+        return { ...polylineOptions, ...polygonOptions };
+      },
       eventHandlers: {
         "pm:update": ({ layer, target }) => {
           meta.featureEach(target.toGeoJSON(), (feature2, index) => {
@@ -335,7 +357,7 @@ function FeatureManager() {
 }
 var FeatureManager_default = FeatureManager;
 var FullscreenControl = core.createControlComponent(function createFullscreenControl(props) {
-  return new L.Control.FullScreen(props);
+  return new L2.Control.FullScreen(props);
 });
 function DynamicLayer(props) {
   const { type, popupTemplate, ...other } = props;
@@ -350,31 +372,38 @@ function DynamicLayer(props) {
     return /* @__PURE__ */ jsxRuntime.jsx(reactLeaflet.WMSTileLayer, { ...opts });
   }
   if (type === "geojson") {
+    let opts = {
+      // pmIgnore: true,
+      pointToLayer: (point2, latlng) => {
+        let markerOpts = { ...other.markerOptions };
+        if (markerOpts.icon) markerOpts.icon = L2__default.default.icon(markerOpts.icon);
+        return L2__default.default.marker(latlng, markerOpts);
+      },
+      style: (feature2) => {
+        return {
+          ...other.polylineOptions,
+          ...other.polygonOptions
+        };
+      },
+      onEachFeature: (feature2, layer) => {
+        popupTemplate && layer.bindPopup(() => {
+          return server.renderToString(
+            /* @__PURE__ */ jsxRuntime.jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
+          );
+        });
+      }
+    };
     if (other.data) {
-      const opts = {
-        data: lodash.isString(other.data) ? JSON.parse(other.data) : other.data,
-        pmIgnore: true,
-        onEachFeature: (feature2, layer) => {
-          popupTemplate && layer.bindPopup(() => {
-            return server.renderToString(
-              /* @__PURE__ */ jsxRuntime.jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
-            );
-          });
-        }
+      opts = {
+        ...opts,
+        data: lodash.isString(other.data) ? JSON.parse(other.data) : other.data
       };
       return /* @__PURE__ */ jsxRuntime.jsx(GeoJSON, { ...opts });
     }
     if (other.dataUrl) {
-      const opts = {
-        dataUrl: other.dataUrl,
-        pmIgnore: true,
-        onEachFeature: (feature2, layer) => {
-          popupTemplate && layer.bindPopup(() => {
-            return server.renderToString(
-              /* @__PURE__ */ jsxRuntime.jsx(PopupTemplate_default, { data: feature2?.properties, ...tplPopupProps })
-            );
-          });
-        }
+      opts = {
+        ...opts,
+        dataUrl: other.dataUrl
       };
       return /* @__PURE__ */ jsxRuntime.jsx(GeoJSONAjax_default, { ...opts });
     }
@@ -391,7 +420,7 @@ var controlComponents = {
   fullscreenControl: FullscreenControl
 };
 var defaultDrawControlOptions = {
-  drawMarker: true,
+  drawMarker: false,
   drawCircle: false,
   drawCircleMarker: false,
   drawPolyline: false,

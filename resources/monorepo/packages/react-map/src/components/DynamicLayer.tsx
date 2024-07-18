@@ -4,6 +4,7 @@ import { isString } from 'lodash'
 import GeoJSONAjax from './GeoJSONAjax'
 import PopupTemplate from './PopupTemplate'
 import { renderToString } from 'react-dom/server'
+import L from 'leaflet'
 
 type TDynamicLayerProps = {
   type: 'wms' | 'geojson'
@@ -11,7 +12,10 @@ type TDynamicLayerProps = {
   data?: Record<string, any> | string
   dataUrl?: string
 
-  popupTemplate: Record<string, any> | string
+  popupTemplate?: Record<string, any> | string
+  markerOptions?: Record<string, any>
+  polylineOptions?: Record<string, any>
+  polygonOptions?: Record<string, any>
 }
 
 function DynamicLayer(props: TDynamicLayerProps) {
@@ -35,35 +39,42 @@ function DynamicLayer(props: TDynamicLayerProps) {
   }
 
   if (type === 'geojson') {
+    let opts = {
+      // pmIgnore: true,
+      pointToLayer: (point, latlng) => {
+        let markerOpts = {...other.markerOptions}
+        if(markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
+        return L.marker(latlng, markerOpts);
+      },
+      style: (feature) => {
+        return {
+          ...other.polylineOptions,
+          ...other.polygonOptions,
+        }
+      },
+      onEachFeature: (feature, layer) => {
+        popupTemplate &&
+          layer.bindPopup(() => {
+            return renderToString(
+              <PopupTemplate data={feature?.properties} {...tplPopupProps} />,
+            )
+          })
+      },
+    } as any
+
     if (other.data) {
-      const opts = {
+      opts = {
+        ...opts,
         data: isString(other.data) ? JSON.parse(other.data as any) : other.data,
-        pmIgnore: true,
-        onEachFeature: (feature, layer) => {
-          popupTemplate &&
-            layer.bindPopup(() => {
-              return renderToString(
-                <PopupTemplate data={feature?.properties} {...tplPopupProps} />,
-              )
-            })
-        },
       }
 
       return <GeoJSON {...opts} />
     }
 
     if (other.dataUrl) {
-      const opts = {
+      opts = {
+        ...opts,
         dataUrl: other.dataUrl,
-        pmIgnore: true,
-        onEachFeature: (feature, layer) => {
-          popupTemplate &&
-            layer.bindPopup(() => {
-              return renderToString(
-                <PopupTemplate data={feature?.properties} {...tplPopupProps} />,
-              )
-            })
-        },
       }
 
       return <GeoJSONAjax {...opts} />

@@ -25,14 +25,18 @@ function GeoJSONAjax(props: TGeoJSONAjax) {
   }, [enabled, dataUrl])
 
   return (
-    <GeoJSON {...opts} data={data} eventHandlers={{
-      'add': (event) => {
-        setEnabled(true)
-      },
-      'remove': (event) => {
-        setEnabled(false)
-      }
-    }}>
+    <GeoJSON
+      {...opts}
+      data={data}
+      eventHandlers={{
+        add: (event) => {
+          setEnabled(true)
+        },
+        remove: (event) => {
+          setEnabled(false)
+        },
+      }}
+    >
       {isFunction(children) && data && children(data)}
     </GeoJSON>
   )
