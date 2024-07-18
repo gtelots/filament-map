@@ -87,7 +87,11 @@ function ControlManager() {
           {layers?.map(
             ({ selected = false, title = 'None', ...layerProps }, k) => (
               <LayersControl.Overlay key={k} name={title} checked={selected}>
-                <DynamicLayer {...(layerProps as any)} />
+                <DynamicLayer
+                  {...(layerProps as any)}
+                  // @ts-ignore
+                  zIndex={100}
+                />
               </LayersControl.Overlay>
             ),
           )}

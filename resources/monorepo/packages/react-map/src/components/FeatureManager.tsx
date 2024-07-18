@@ -8,7 +8,7 @@ import { getCoord, getCoords, getGeom, getType } from '@turf/invariant'
 import { featureEach } from '@turf/meta'
 import { map as _map, get, last } from 'lodash'
 import { useEffect } from 'react'
-import { useMap } from 'react-leaflet'
+import { Pane, useMap } from 'react-leaflet'
 import { featuresSelectors, useMapStore } from '../hooks/useMapStore'
 import { useUpdateEffect } from 'react-use'
 import setFeaturesByState from '../utils/setFeaturesByState'
@@ -106,51 +106,65 @@ function FeatureManager() {
     }
   }, [JSON.stringify(features)])
 
-  return features?.map((f, k) => (
-    <GeoJSON
-      key={k}
-      data={f}
-      pointToLayer={(point, latlng) => {
-        let markerOpts = {...markerOptions}
-        if(markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
-        return L.marker(latlng, markerOpts);
-      }}
-      style={() => {
-        return {...polylineOptions, ...polygonOptions, ...rectangleOptions}
-      }}
-      eventHandlers={
-        {
-          'pm:update': ({ layer, target }) => {
-            featureEach(target.toGeoJSON(), (feature, index) => {
-              updateFeature({
-                id: feature.id,
-                changes: feature,
-              })
-            })
-          },
-
-          'pm:cut': (e) => {
-            map.removeLayer(e.layer)
-
-            const id = get(e, 'originalLayer.feature.id')
-            removeFeature(id)
-
-            const type = getType(e.layer.toGeoJSON())
-            const geometry = getGeom(
-              type === geomType
-                ? e.layer.toGeoJSON()
-                : e.originalLayer.toGeoJSON(),
-            )
-
-            setFeaturesByState({
-              state: geometry,
-              setFeatures,
-            })
-          },
-        } as any
+  let geojsonOpts = {
+    pointToLayer: (point, latlng) => {
+      let markerOpts = { ...markerOptions }
+      if (markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
+      return L.marker(latlng, markerOpts)
+    },
+    style: () => {
+      return {
+        ...polylineOptions,
+        ...polygonOptions,
+        ...rectangleOptions,
       }
-    />
-  ))
+    },
+    eventHandlers: {
+      'pm:update': ({ layer, target }) => {
+        featureEach(target.toGeoJSON(), (feature, index) => {
+          updateFeature({
+            id: feature.id,
+            changes: feature,
+          })
+        })
+      },
+
+      'pm:cut': (e) => {
+        map.removeLayer(e.layer)
+
+        const id = get(e, 'originalLayer.feature.id')
+        removeFeature(id)
+
+        const type = getType(e.layer.toGeoJSON())
+        const geometry = getGeom(
+          type === geomType
+            ? e.layer.toGeoJSON()
+            : e.originalLayer.toGeoJSON(),
+        )
+
+        setFeaturesByState({
+          state: geometry,
+          setFeatures,
+        })
+      },
+    } as any,
+    pane: ['Point', 'MultiPoint'].includes(geomType) ? 'stateMarkerPane' : 'stateOverlayPane'
+  }
+
+  return (
+    <>
+      <Pane name="stateOverlayPane" style={{ zIndex: 450 }} />
+      <Pane name="stateMarkerPane" style={{ zIndex: 650 }} />
+
+      {features?.map((f, k) => (
+        <GeoJSON
+          key={k}
+          data={f}
+          {...geojsonOpts}
+        />
+      ))}
+    </>
+  )
 }
 
 export default FeatureManager

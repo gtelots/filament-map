@@ -3,7 +3,8 @@ import Alpine from 'alpinejs'
 import { cloneDeep } from 'lodash'
 import { useEffect, useRef } from 'react'
 import {
-  MapContainer
+  MapContainer,
+  Pane
 } from 'react-leaflet'
 import { ControlManager, FeatureManager, setDefaultIcon, setFeaturesByState, useMapStore, zoomToFeatureByState } from 'react-map'
 

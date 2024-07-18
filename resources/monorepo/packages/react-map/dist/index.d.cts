@@ -27,7 +27,7 @@ type TGeoJSONAjax = {
 };
 declare function GeoJSONAjax(props: TGeoJSONAjax): react_jsx_runtime.JSX.Element;
 
-declare function FeatureManager(): any;
+declare function FeatureManager(): react_jsx_runtime.JSX.Element;
 
 declare function ControlManager(): any[];
 
