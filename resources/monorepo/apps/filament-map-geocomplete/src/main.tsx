@@ -12,6 +12,8 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
     result: null as any,
 
     init: function () {
+      console.log(config);
+
       const geocompleteEl = config.statePath
       const geoComplete = document.getElementById(geocompleteEl)
 
