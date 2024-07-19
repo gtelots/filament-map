@@ -54,6 +54,9 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
           const radius = map.distance(bounds.getNorthEast(), bounds.getNorthWest()) / 2
           this.autocompleteParams.location = [center.lat, center.lng].join(',')
           this.autocompleteParams.radius = Math.round(radius)
+        } else {
+          delete this.autocompleteParams['location']
+          delete this.autocompleteParams['radius']
         }
       }
 
