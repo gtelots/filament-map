@@ -21,7 +21,7 @@ function filamentMapField(
       const root = createRoot(mapEl)
 
       const appProps: any = {
-        $wire: this['$wire'],
+        $root: this['$root'],
         $watch: this['$watch'],
         state: cloneDeep(Alpine.raw(this.state)),
         config

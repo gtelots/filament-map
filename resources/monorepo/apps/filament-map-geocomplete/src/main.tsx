@@ -42,6 +42,11 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
 
         geoComplete.addEventListener('input', handleInputChange)
       }
+
+      window.addEventListener('filament-map::mapMoveend', (event: any) => {
+        const map = event.detail.target
+        console.log(event);
+      })
     },
 
     getSuggestions: function (input) {
@@ -50,6 +55,9 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
           ...config.autocompleteParams,
           input,
         }),
+        {
+          mode: 'no-cors'
+        }
       )
         .then((resp) => resp.json())
         .then((resp) => {
@@ -66,6 +74,9 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
           place_id,
           key: config.googleMapsAPIKey,
         }),
+        {
+          mode: 'no-cors'
+        }
       )
         .then((resp) => resp.json())
         .then((resp) => {

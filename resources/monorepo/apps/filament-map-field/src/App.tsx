@@ -1,7 +1,7 @@
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 import Alpine from 'alpinejs'
 import { cloneDeep, get } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   MapContainer,
   Marker,
@@ -13,6 +13,7 @@ import L from 'leaflet'
 import { TConfig } from './types'
 
 export type AppProps = {
+  $root: any
   $wire: any
   $watch: any
   state: any
@@ -23,7 +24,7 @@ export type AppProps = {
 setDefaultIcon()
 
 function App(props: AppProps) {
-  const { $wire, $watch, state, config } = props
+  const { $root, $wire, $watch, state, config } = props
   const {
     statePath,
     defaultCenter,
@@ -59,6 +60,15 @@ function App(props: AppProps) {
     center: defaultCenter,
     zoom: defaultZoom,
     whenReady: ({ target: map }) => {
+      map.on('moveend', e => {
+        $root.dispatchEvent(
+          new CustomEvent('filament-map::mapMoveend', {
+            detail: e,
+            bubbles: true,
+          }),
+        )
+      })
+
       setTimeout(() => {
         map.invalidateSize()
       }, 100)
@@ -102,8 +112,13 @@ function App(props: AppProps) {
         [viewport.southwest.lat, viewport.southwest.lng],
         [viewport.northeast.lat, viewport.northeast.lng],
       ])
-
     })
+  }, [])
+
+  const getMarkerOpts = useCallback(() => {
+    let markerOpts = { ...config.markerOptions }
+    if (markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
+    return markerOpts
   }, [])
 
   return (
@@ -111,7 +126,7 @@ function App(props: AppProps) {
       <ControlManager />
       <FeatureManager />
 
-      {geocompleteLocation && <Marker position={geocompleteLocation} />}
+      {geocompleteLocation && <Marker position={geocompleteLocation} {...getMarkerOpts()} />}
     </MapContainer>
   )
 }
