@@ -69,6 +69,8 @@ function FeatureManager() {
 
   useUpdateEffect(() => {
     if (features?.length) {
+      console.log(features);
+
       if (
         ['Point', 'LineString', 'Polygon'].includes(geomType) &&
         features?.length === 1
