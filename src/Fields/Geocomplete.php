@@ -30,10 +30,10 @@ class Geocomplete extends Field implements Contracts\CanBeLengthConstrained, Con
 
     protected Closure|string|null $latitudeField = null;
 
-    protected string|null $autocompleteUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+    protected string|null $autocompleteUrl = null;
     protected array|null $autocompleteParams = [];
 
-    protected string|null $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
+    protected string|null $detailUrl = null;
 
     /**
      * Main field config variables
@@ -83,13 +83,11 @@ class Geocomplete extends Field implements Contracts\CanBeLengthConstrained, Con
     }
 
     public function getAutocompleteUrl(): string {
-        return $this->autocompleteUrl;
+        return $this->autocompleteUrl ?? config('filament-map.geocomplete.url');
     }
 
     public function autocompleteParams(array $autocompleteParams): static {
-        $this->autocompleteParams = array_merge([
-
-        ], $autocompleteParams);
+        $this->autocompleteParams = $autocompleteParams;
 
         return $this;
     }
@@ -109,7 +107,7 @@ class Geocomplete extends Field implements Contracts\CanBeLengthConstrained, Con
     }
 
     public function getDetailUrl(): string {
-        return $this->detailUrl;
+        return $this->detailUrl ?? config('filament-map.geocomplete.detailUrl');
     }
 
     /**

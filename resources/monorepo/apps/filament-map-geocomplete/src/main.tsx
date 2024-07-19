@@ -54,11 +54,7 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
         urlcat(config.autocompleteUrl, {
           ...config.autocompleteParams,
           input,
-        }),
-        {
-          mode: 'no-cors'
-        }
-      )
+        }))
         .then((resp) => resp.json())
         .then((resp) => {
           this.suggestions = resp.predictions
@@ -73,11 +69,7 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
         urlcat(config.detailUrl, {
           place_id,
           key: config.googleMapsAPIKey,
-        }),
-        {
-          mode: 'no-cors'
-        }
-      )
+        }))
         .then((resp) => resp.json())
         .then((resp) => {
           this.result = resp.result

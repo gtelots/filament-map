@@ -63,7 +63,11 @@ return [
         ]
     ],
     'geocomplete' => [
-        'language' => 'vi',
-        'components' => 'country:vn',
-    ]
+        'url' => 'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+        'detailUrl' => 'https://maps.googleapis.com/maps/api/place/details/json',
+        'params' => [
+            'language' => 'vi',
+            'components' => 'country:vn',
+        ]
+    ],
 ];
