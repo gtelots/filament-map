@@ -60,6 +60,13 @@ function App(props: AppProps) {
     center: defaultCenter,
     zoom: defaultZoom,
     whenReady: ({ target: map }) => {
+      $root.dispatchEvent(
+        new CustomEvent('filament-map::mapWhenReady', {
+          detail: { target: map },
+          bubbles: true,
+        }),
+      )
+
       map.on('moveend', e => {
         $root.dispatchEvent(
           new CustomEvent('filament-map::mapMoveend', {

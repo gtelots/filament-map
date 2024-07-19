@@ -7,6 +7,8 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
   return {
     open: false,
 
+    autocompleteParams: {...config.autocompleteParams},
+
     suggestions: [],
 
     result: null as any,
@@ -45,16 +47,30 @@ function filamentMapGeocomplete({ config, setStateUsing }) {
         geoComplete.addEventListener('input', handleInputChange)
       }
 
+      const handleLocationParam = (map) => {
+        if(map.getZoom() >= 8){
+          const bounds = map.getBounds()
+          const center = bounds.getCenter()
+          const radius = map.distance(bounds.getNorthEast(), bounds.getNorthWest()) / 2
+          this.autocompleteParams.location = [center.lat, center.lng].join(',')
+          this.autocompleteParams.radius = Math.round(radius)
+        }
+      }
+
+
+      window.addEventListener('filament-map::mapWhenReady', (event: any) => {
+        handleLocationParam(event.detail.target)
+      })
+
       window.addEventListener('filament-map::mapMoveend', (event: any) => {
-        const map = event.detail.target
-        console.log(event);
+        handleLocationParam(event.detail.target)
       })
     },
 
     getSuggestions: function (input) {
       return fetch(
         urlcat(config.autocompleteUrl, {
-          ...config.autocompleteParams,
+          ...this.autocompleteParams,
           input,
         }))
         .then((resp) => resp.json())
