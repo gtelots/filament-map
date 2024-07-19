@@ -16,6 +16,8 @@ import zoomToFeatureByState from '../utils/zoomToFeatureByState'
 import { GeoJSON } from '../components/GeoJSON'
 import L from 'leaflet'
 
+console.log(123);
+
 function FeatureManager() {
   const map = useMap()
   const [

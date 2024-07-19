@@ -38942,6 +38942,7 @@ function zoomToFeatureByState({
   }
 }
 var zoomToFeatureByState_default = zoomToFeatureByState;
+console.log(123);
 function FeatureManager() {
   const map$1 = useMap();
   const [

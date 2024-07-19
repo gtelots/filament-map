@@ -238,6 +238,7 @@ function zoomToFeatureByState({
   }
 }
 var zoomToFeatureByState_default = zoomToFeatureByState;
+console.log(123);
 function FeatureManager() {
   const map = reactLeaflet.useMap();
   const [
