@@ -14,6 +14,7 @@
                 mapEl: $refs.map,
             })
         "
+        id="{{ $getId() . '-alpine' }}"
     >
         <div
             x-ref="map"

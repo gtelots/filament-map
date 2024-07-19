@@ -16,7 +16,7 @@ function filamentMapField(
   return {
     state,
     init: function () {
-      console.log(state, config);
+      // console.log(state, config);
 
       const root = createRoot(mapEl)
 

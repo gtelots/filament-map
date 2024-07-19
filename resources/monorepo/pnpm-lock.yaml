@@ -254,6 +254,9 @@ importers:
 
   apps/filament-map-geocomplete:
     dependencies:
+      alpinejs:
+        specifier: ^3.14.1
+        version: 3.14.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21

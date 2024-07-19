@@ -1,12 +1,14 @@
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 import Alpine from 'alpinejs'
-import { cloneDeep } from 'lodash'
-import { useEffect, useRef } from 'react'
+import { cloneDeep, get } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import {
   MapContainer,
+  Marker,
   Pane
 } from 'react-leaflet'
 import { ControlManager, FeatureManager, setDefaultIcon, setFeaturesByState, useMapStore, zoomToFeatureByState } from 'react-map'
+import L from 'leaflet'
 
 import { TConfig } from './types'
 
@@ -43,7 +45,9 @@ function App(props: AppProps) {
     ],
   )
 
-  const mapRef = useRef(null)
+  const [geocompleteLocation, setGeocompleteLocation] = useState<any>()
+
+  const mapRef = useRef<any>(null)
 
   const mapOptions = {
     style: {
@@ -82,12 +86,32 @@ function App(props: AppProps) {
         map,
       })
     })
+
+    window.addEventListener('filament-map::geocompleteSelected', (event) => {
+      const location = get(event, 'detail.geometry.location')
+      const viewport = get(event, 'detail.geometry.viewport') as any
+
+      let markerOpts = { ...config.markerOptions }
+      if (markerOpts.icon) markerOpts.icon = L.icon(markerOpts.icon)
+
+      if(!['Point', 'MultiPoint'].includes(config.geomType)){
+        setGeocompleteLocation(location)
+      }
+
+      mapRef.current.fitBounds([
+        [viewport.southwest.lat, viewport.southwest.lng],
+        [viewport.northeast.lat, viewport.northeast.lng],
+      ])
+
+    })
   }, [])
 
   return (
     <MapContainer {...mapOptions} ref={mapRef}>
       <ControlManager />
       <FeatureManager />
+
+      {geocompleteLocation && <Marker position={geocompleteLocation} />}
     </MapContainer>
   )
 }

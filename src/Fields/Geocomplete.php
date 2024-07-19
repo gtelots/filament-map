@@ -96,7 +96,9 @@ class Geocomplete extends Field implements Contracts\CanBeLengthConstrained, Con
 
     public function getAutocompleteParams(): array {
         return array_merge(config('filament-map.geocomplete'), [
-            'key' => env('GOOGLE_MAPS_API_KEY')
+            'location' => join(',', config('filament-map.config.mapOptions.center')),
+            'radius' => 1e3,
+            'key' => env('GOOGLE_MAPS_API_KEY'),
         ], $this->autocompleteParams);
     }
 
