@@ -61,5 +61,9 @@ return [
                 'iconAnchor' => [20, 40],
             ]
         ]
+    ],
+    'geocomplete' => [
+        'language' => 'vi',
+        'components' => 'country:vn',
     ]
 ];

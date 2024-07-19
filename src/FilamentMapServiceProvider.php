@@ -110,6 +110,9 @@ class FilamentMapServiceProvider extends PackageServiceProvider
 
             AlpineComponent::make('filament-map-entry', __DIR__ . '/../resources/monorepo/apps/filament-map-entry/dist/assets/index.js'),
             Css::make('filament-map-entry', __DIR__ . '/../resources/monorepo/apps/filament-map-entry/dist/assets/index.css')->loadedOnRequest(),
+
+            AlpineComponent::make('filament-map-geocomplete', __DIR__ . '/../resources/monorepo/apps/filament-map-geocomplete/dist/assets/index.js'),
+            Css::make('filament-map-geocomplete', __DIR__ . '/../resources/monorepo/apps/filament-map-geocomplete/dist/assets/index.css')->loadedOnRequest(),
         ];
     }
 

@@ -86,13 +86,6 @@ class Map extends Field
         return $this->evaluate($this->height);
     }
 
-    public function latitudeField(Closure|string|null $latitudeField = null): static
-    {
-        $this->latitudeField = $latitudeField;
-
-        return $this;
-    }
-
     public function defaultCenter(Closure|array $location): static
     {
         $this->defaultCenter = $location;
@@ -123,6 +116,13 @@ class Map extends Field
         if(is_numeric($zoom) && $zoom >= 0) return $zoom;
 
         return config('filament-map.config.mapOptions.zoom') ?? 0;
+    }
+
+    public function latitudeField(Closure|string|null $latitudeField = null): static
+    {
+        $this->latitudeField = $latitudeField;
+
+        return $this;
     }
 
     public function getLatitudeField(): ?string

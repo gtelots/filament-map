@@ -3,6 +3,9 @@
     "file": "assets/index.js",
     "name": "index",
     "src": "index.html",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "assets/index.css"
+    ]
   }
 }

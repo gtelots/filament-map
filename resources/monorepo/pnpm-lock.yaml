@@ -254,16 +254,25 @@ importers:
 
   apps/filament-map-geocomplete:
     dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      urlcat:
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@tsconfig/vite-react':
         specifier: ^3.0.2
         version: 3.0.2
+      '@types/lodash':
+        specifier: ^4.17.6
+        version: 4.17.6
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -3183,6 +3192,13 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /qs@6.12.3:
+    resolution: {integrity: sha512-AWJm14H1vVaO/iNZ4/hO+HyaTehuy9nRqVdkTqlJt0HWvBiBIEXFmb4C0DGeYo3Xes9rrEW+TxHsaigCbN5ICQ==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.6
+    dev: false
+
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: true
@@ -4053,6 +4069,12 @@ packages:
     dependencies:
       punycode: 2.3.1
     dev: true
+
+  /urlcat@3.1.0:
+    resolution: {integrity: sha512-qY6b94/aGMIHh70EEQ/4hfR2LUGZ+fPQNp64cf7yRX9kAp4XG2tx7LgYUU1Qkh17bFylME0u4n3lOezonougPw==}
+    dependencies:
+      qs: 6.12.3
+    dev: false
 
   /use-sync-external-store@1.2.0(react@18.3.1):
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}

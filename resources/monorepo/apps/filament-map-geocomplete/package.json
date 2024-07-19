@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "urlcat": "^3.1.0"
   },
   "devDependencies": {
     "@tsconfig/vite-react": "^3.0.2",
+    "@types/lodash": "^4.17.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
