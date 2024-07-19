@@ -39361,6 +39361,7 @@ function filamentMapField({
       const appProps = {
         $root: this["$root"],
         $watch: this["$watch"],
+        $wire: this["$wire"],
         state: lodashExports.cloneDeep(Alpine.raw(this.state)),
         config
       };
